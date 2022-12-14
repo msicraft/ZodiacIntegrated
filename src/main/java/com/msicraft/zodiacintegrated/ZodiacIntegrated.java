@@ -131,4 +131,5 @@ public final class ZodiacIntegrated extends JavaPlugin {
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin replaced the old streamerGuild.yml with streamerGuild_old.yml and created a new streamerGuild.yml");
     }
 
+
 }
