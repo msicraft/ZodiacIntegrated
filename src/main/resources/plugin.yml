@@ -1,0 +1,14 @@
+name: ZodiacIntegrated
+version: 1.0 #'${project.version}'
+main: com.msicraft.zodiacintegrated.ZodiacIntegrated
+api-version: 1.19
+authors: [ msicraftz ]
+commands:
+  zodiac:
+    description: Main Command
+    aliases: [zd]
+    permission-message: You don't have permission
+permissions:
+  zodiac.command:
+    description: Allow Command
+    default: op
