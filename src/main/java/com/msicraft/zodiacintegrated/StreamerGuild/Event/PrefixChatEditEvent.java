@@ -43,13 +43,13 @@ public class PrefixChatEditEvent implements Listener {
                     if (var.equals("Change_Prefix")) {
                         String getChat = plainText.serialize(component);
                         Group group = guildUtil.getGroup(player);
-                        String originalPrefix = group.getPrefix();
                         if (!getChat.equals("cancel")) {
                             String pattern = "^[0-9|a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]*$";
                             if (!Pattern.matches(pattern, getChat)) {
                                 player.sendMessage(ChatColor.RED +"특수문자는 사용 불가능합니다");
                             } else {
                                 String guildId = guildUtil.getContainGuildID(player);
+                                String originalPrefix = ZodiacIntegrated.streamerGuildData.getConfig().getString("Guild." + guildId + ".PrefixName");
                                 String regexPrefix = "[" + getChat + "] ";
                                 group.setPrefix(regexPrefix);
                                 ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId + ".Name", regexPrefix);
@@ -57,7 +57,7 @@ public class PrefixChatEditEvent implements Listener {
                                 ZodiacIntegrated.streamerGuildData.saveConfig();
                                 player.sendMessage(ChatColor.GREEN + "길드 칭호 이름이 변경되었습니다.");
                                 player.sendMessage(ChatColor.GREEN + "변경전 이름: " + ChatColor.WHITE + originalPrefix);
-                                player.sendMessage(ChatColor.GREEN + "변경된 이름: " + ChatColor.WHITE + regexPrefix);
+                                player.sendMessage(ChatColor.GREEN + "변경된 이름: " + ChatColor.WHITE + getChat);
                             }
                         }
                         isPrefixChatEdit.put(uuid, false);

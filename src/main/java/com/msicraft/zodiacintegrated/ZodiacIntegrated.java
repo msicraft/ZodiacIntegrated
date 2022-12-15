@@ -4,6 +4,7 @@ import com.christian34.easyprefix.EasyPrefix;
 import com.msicraft.zodiacintegrated.Command.MainCommand;
 import com.msicraft.zodiacintegrated.Command.TabComplete;
 import com.msicraft.zodiacintegrated.Data.StreamerGuildData;
+import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.Event.PvPDeathPenalty;
 import com.msicraft.zodiacintegrated.Event.WhitelistEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.PrefixChatEditEvent;
@@ -26,6 +27,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
 
     private static ZodiacIntegrated plugin;
     public static StreamerGuildData streamerGuildData;
+    public static WhiteListPlayerData whiteListPlayerData;
 
     public static ZodiacIntegrated getPlugin() {
         return plugin;
@@ -43,6 +45,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         streamerGuildData = new StreamerGuildData(this);
+        whiteListPlayerData = new WhiteListPlayerData(this);
         createFiles();
         final int configVersion = plugin.getConfig().contains("config-version", true) ? plugin.getConfig().getInt("config-version") : -1;
         if (configVersion != 1) {
@@ -91,6 +94,8 @@ public final class ZodiacIntegrated extends JavaPlugin {
 
     public void FilesReload() {
         getPlugin().reloadConfig();
+        streamerGuildData.reloadConfig();
+        whiteListPlayerData.reloadConfig();
     }
 
     protected FileConfiguration config;

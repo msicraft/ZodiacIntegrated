@@ -1,5 +1,7 @@
 package com.msicraft.zodiacintegrated.Command;
 
+import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
+import com.msicraft.zodiacintegrated.PlayerUtils.PlayerUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 public class MainCommand implements CommandExecutor {
 
     private final GuildUtil guildUtil = new GuildUtil();
+    private final PlayerUtil playerUtil = new PlayerUtil();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -136,6 +139,7 @@ public class MainCommand implements CommandExecutor {
                                                 player.sendMessage(ChatColor.RED + "해당 플레이어는 이미 길드에 소속 되어있습니다.");
                                             } else {
                                                 guildUtil.registerGuild(guildId, offlinePlayer);
+                                                playerUtil.registerWhiteListPlayer(offlinePlayer, guildId);
                                                 player.sendMessage(ChatColor.GREEN + "해당 플레이어가 길드에 소속되었습니다.");
                                             }
                                         } else {

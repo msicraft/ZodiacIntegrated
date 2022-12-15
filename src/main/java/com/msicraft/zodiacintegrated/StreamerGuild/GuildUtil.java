@@ -29,10 +29,18 @@ public class GuildUtil {
     }
 
     public Group getGroup(Player player) {
-        OfflinePlayer guildOwner = Bukkit.getOfflinePlayer(getGuildOwner(getContainGuildID(player)));
+        Group g = null;
+        String guildId = getContainGuildID(player);
+        OfflinePlayer guildOwner = Bukkit.getOfflinePlayer(UUID.fromString(guildId));
         String groupName = guildOwner.getName() + "의_길드";
         GroupHandler groupHandler = ZodiacIntegrated.getEasyPrefix().getGroupHandler();
-        return groupHandler.getGroup(groupName);
+        for (Group group : groupHandler.getGroups()) {
+            if (group.getName().equals(groupName)) {
+                g = group;
+                break;
+            }
+        }
+        return g;
     }
 
     public int getIdentifiedIndex(UUID uuid) {
@@ -103,11 +111,14 @@ public class GuildUtil {
 
     public String getContainGuildID(Player player) {
         String uuidS = null;
-        for (String guildUUID : ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player")) {
-            if (ZodiacIntegrated.streamerGuildData.getConfig().getStringList("Guild." + guildUUID + ".Member").contains(player.getUniqueId().toString())) {
-                uuidS = ZodiacIntegrated.streamerGuildData.getConfig().getString("Guild." + guildUUID + ".ID");
-            } else if (ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player").contains(player.getUniqueId().toString())) {
-                uuidS = ZodiacIntegrated.streamerGuildData.getConfig().getString("Guild." + guildUUID + ".ID");
+        if (ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player").contains(player.getUniqueId().toString())) {
+            uuidS = player.getUniqueId().toString();
+        } else {
+            for (String guildUUID : ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player")) {
+                if (isGuildMember(player.getUniqueId(), guildUUID) || isGuildSubOwner(player.getUniqueId(), guildUUID)) {
+                    uuidS = getGuildOwner(guildUUID).toString();
+                    break;
+                }
             }
         }
         return uuidS;
