@@ -3,6 +3,7 @@ version: 1.0 #'${project.version}'
 main: com.msicraft.zodiacintegrated.ZodiacIntegrated
 api-version: 1.19
 authors: [ msicraftz ]
+depend: [Vault]
 commands:
   zodiac:
     description: Main Command

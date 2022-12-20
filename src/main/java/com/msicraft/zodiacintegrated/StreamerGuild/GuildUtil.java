@@ -164,4 +164,28 @@ public class GuildUtil {
         }
     }
 
+    public double getGuildMoney(String guildId) {
+        double money = 0;
+        if (ZodiacIntegrated.streamerGuildData.getConfig().contains("Guild." + guildId)) {
+            money = ZodiacIntegrated.streamerGuildData.getConfig().getDouble("Guild." + guildId + ".Money");
+        }
+        return money;
+    }
+
+    public void addGuildMoney(String guildId, double addMoney) {
+        double getGuildMoney = getGuildMoney(guildId);
+        double result = getGuildMoney + addMoney;
+        double resultFloor = Math.floor(result);
+        ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId + ".Money", resultFloor);
+        ZodiacIntegrated.streamerGuildData.saveConfig();
+    }
+
+    public void removeGuildMoney(String guildId, double removeMoney) {
+        double getGuildMoney = getGuildMoney(guildId);
+        double result = getGuildMoney - removeMoney;
+        double resultFloor = Math.floor(result);
+        ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId + ".Money", resultFloor);
+        ZodiacIntegrated.streamerGuildData.saveConfig();
+    }
+
 }

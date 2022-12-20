@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class PrefixChatEditEvent implements Listener {
 
-    private GuildUtil guildUtil = new GuildUtil();
+    private final GuildUtil guildUtil = new GuildUtil();
 
     public static HashMap<UUID, Boolean> isPrefixChatEdit = new HashMap<>();
     public static HashMap<UUID, String> prefixEditVar = new HashMap<>();

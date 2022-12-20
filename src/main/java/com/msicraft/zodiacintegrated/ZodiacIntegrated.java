@@ -7,8 +7,11 @@ import com.msicraft.zodiacintegrated.Data.StreamerGuildData;
 import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.Event.PvPDeathPenalty;
 import com.msicraft.zodiacintegrated.Event.WhitelistEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPlayerJoinEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.PrefixChatEditEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event.GuildMainInvEvent;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
@@ -16,6 +19,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -41,6 +45,8 @@ public final class ZodiacIntegrated extends JavaPlugin {
         return "[Zodiac Integrated]";
     }
 
+    private static Economy econ = null;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -65,6 +71,11 @@ public final class ZodiacIntegrated extends JavaPlugin {
         } else {
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " You are using the latest version of streamerGuild.yml");
         }
+        if (!setupEconomy()) {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " No economy plugin found. Disabling");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         eventsRegister();
         commandsRegister();
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin Enable");
@@ -82,6 +93,8 @@ public final class ZodiacIntegrated extends JavaPlugin {
         pluginManager.registerEvents(new GuildMainInvEvent(), this);
         pluginManager.registerEvents(new WhitelistEvent(), this);
         pluginManager.registerEvents(new PrefixChatEditEvent(), this);
+        pluginManager.registerEvents(new GuildPlayerJoinEvent(), this);
+        pluginManager.registerEvents(new GuildMoneyChatEditEvent(), this);
     }
 
     private void commandsRegister() {
@@ -134,6 +147,22 @@ public final class ZodiacIntegrated extends JavaPlugin {
         File config_old = new File(getDataFolder(),"streamerGuild_old-" + dateFormat.format(date) + ".yml");
         file.renameTo(config_old);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin replaced the old streamerGuild.yml with streamerGuild_old.yml and created a new streamerGuild.yml");
+    }
+
+    public static Economy getEconomy() {
+        return econ;
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
 
