@@ -7,6 +7,8 @@ import com.msicraft.zodiacintegrated.Data.StreamerGuildData;
 import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.Event.PvPDeathPenalty;
 import com.msicraft.zodiacintegrated.Event.WhitelistEvent;
+import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
+import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPlayerJoinEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.PrefixChatEditEvent;
@@ -26,12 +28,18 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 public final class ZodiacIntegrated extends JavaPlugin {
 
     private static ZodiacIntegrated plugin;
     public static StreamerGuildData streamerGuildData;
     public static WhiteListPlayerData whiteListPlayerData;
+    public static EvolutionConfig evolutionConfig;
+    public static EvolutionDataConfig evolutionDataConfig;
+    public static UUID developerUUID = UUID.fromString("67bfaabc-6d16-4ad7-90f7-177697c05cee");
+
+    private static Economy econ = null;
 
     public static ZodiacIntegrated getPlugin() {
         return plugin;
@@ -45,13 +53,14 @@ public final class ZodiacIntegrated extends JavaPlugin {
         return "[Zodiac Integrated]";
     }
 
-    private static Economy econ = null;
 
     @Override
     public void onEnable() {
         plugin = this;
         streamerGuildData = new StreamerGuildData(this);
         whiteListPlayerData = new WhiteListPlayerData(this);
+        evolutionConfig = new EvolutionConfig(this);
+        evolutionDataConfig = new EvolutionDataConfig(this);
         createFiles();
         final int configVersion = plugin.getConfig().contains("config-version", true) ? plugin.getConfig().getInt("config-version") : -1;
         if (configVersion != 1) {
@@ -70,6 +79,20 @@ public final class ZodiacIntegrated extends JavaPlugin {
             streamerGuildData = new StreamerGuildData(this);
         } else {
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " You are using the latest version of streamerGuild.yml");
+        }
+        final int evolutionConfigVersion = evolutionConfig.getConfig().contains("config-version", true) ? evolutionConfig.getConfig().getInt("config-version") : -1;
+        if (evolutionConfigVersion != -1) {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolution");
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " Created the latest evolution.yml after replacing the old evolution.yml with evolution_old.yml");
+            replaceEvolutionConfig();
+            evolutionConfig = new EvolutionConfig(this);
+        }
+        final int evolutionDataConfigVersion = evolutionDataConfig.getConfig().contains("config-version", true) ? evolutionDataConfig.getConfig().getInt("config-version") : -1;
+        if (evolutionDataConfigVersion != -1) {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolutionData");
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " Created the latest evolutionData.yml after replacing the old evolutionData.yml with evolutionData_old.yml");
+            replaceEvolutionDataConfig();
+            evolutionDataConfig = new EvolutionDataConfig(this);
         }
         if (!setupEconomy()) {
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " No economy plugin found. Disabling");
@@ -147,6 +170,26 @@ public final class ZodiacIntegrated extends JavaPlugin {
         File config_old = new File(getDataFolder(),"streamerGuild_old-" + dateFormat.format(date) + ".yml");
         file.renameTo(config_old);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin replaced the old streamerGuild.yml with streamerGuild_old.yml and created a new streamerGuild.yml");
+    }
+
+    private void replaceEvolutionConfig() {
+        File file = new File(getDataFolder(), "evolution.yml");
+        this.config = YamlConfiguration.loadConfiguration(file);
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        File config_old = new File(getDataFolder(),"evolution_old-" + dateFormat.format(date) + ".yml");
+        file.renameTo(config_old);
+        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin replaced the old evolution.yml with evolution_old.yml and created a new evolution.yml");
+    }
+
+    private void replaceEvolutionDataConfig() {
+        File file = new File(getDataFolder(), "evolutionData.yml");
+        this.config = YamlConfiguration.loadConfiguration(file);
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        File config_old = new File(getDataFolder(),"evolutionData_old-" + dateFormat.format(date) + ".yml");
+        file.renameTo(config_old);
+        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin replaced the old evolutionData.yml with evolutionData_old.yml and created a new evolutionData.yml");
     }
 
     public static Economy getEconomy() {

@@ -21,6 +21,12 @@ public class TabComplete implements TabCompleter {
                 arguments.add("help");
                 arguments.add("reload");
                 arguments.add("guild");
+                arguments.add("admin");
+                return arguments;
+            }
+            if (args.length == 2 && args[0].equals("admin") && sender.isOp()) {
+                List<String> arguments = new ArrayList<>();
+                arguments.add("menu");
                 return arguments;
             }
             if (args.length == 2 && args[0].equals("guild") && sender.isOp()) {
@@ -30,6 +36,11 @@ public class TabComplete implements TabCompleter {
                 arguments.add("menu");
                 arguments.add("invite");
                 arguments.add("banish");
+                return arguments;
+            }
+            if (args.length == 1) {
+                List<String> arguments = new ArrayList<>();
+                arguments.add("guild");
                 return arguments;
             }
             if (args.length == 2 && args[0].equals("guild")) {

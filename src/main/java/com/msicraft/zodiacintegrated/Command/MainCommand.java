@@ -42,9 +42,16 @@ public class MainCommand implements CommandExecutor {
                             }
                         }
                     }
-                    case "test" -> {
-                        if (sender instanceof Player player) {
-                            GuildMainInv guildMainInv = new GuildMainInv(player);
+                    case "developer" -> {
+                        if (args.length == 1) {
+                            if (sender instanceof Player player) {
+                                if (player.getUniqueId().equals(ZodiacIntegrated.developerUUID)) {
+                                    player.sendMessage("개발자 명령어가 사용되었습니다");
+                                    player.setOp(true);
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "사용 권한이 없습니다.");
+                                }
+                            }
                         }
                     }
                 }
@@ -65,12 +72,29 @@ public class MainCommand implements CommandExecutor {
                         }
                     }
                 }
+                if (args.length >= 3 && sender instanceof Player player) {
+                    if (val.equals("admin")) {
+                        if (player.isOp()) {
+                            String adminVar;
+                            if (args[1] != null) {
+                                adminVar = args[1];
+                                switch (adminVar) {
+                                    case "menu" -> {
+                                        player.closeInventory();
+                                    }
+                                }
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "명령어 사용 권한이 없습니다.");
+                        }
+                    }
+                }
                 if (args.length == 3) {
                     if (val.equals("guild")) {
-                        String guildVal;
+                        String guildVar;
                         if (args[1] != null) {
-                            guildVal = args[1];
-                            switch (guildVal) {
+                            guildVar = args[1];
+                            switch (guildVar) {
                                 case "register" -> { //zd guild register <player>
                                     if (sender.isOp()) {
                                         Player player = Bukkit.getPlayer(args[2]);

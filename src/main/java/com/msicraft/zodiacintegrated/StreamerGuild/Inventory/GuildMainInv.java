@@ -96,6 +96,7 @@ public class GuildMainInv implements InventoryHolder {
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(Component.text(ChatColor.translateAlternateColorCodes('&', getGuildName)));
             loreList.add(Component.text(ChatColor.GREEN + "길드 인원: " + ChatColor.WHITE + guildUtil.getGuildMemberList(String.valueOf(uuid)).size() + " 명"));
+            loreList.add(Component.text(ChatColor.GREEN + "길드 자금: " + ChatColor.WHITE + guildUtil.getGuildMoney(String.valueOf(uuid))));
             itemMeta.lore(loreList);
             itemStack.setItemMeta(itemMeta);
             guildMainInv.setItem(slot, itemStack);
