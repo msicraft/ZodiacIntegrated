@@ -1,7 +1,8 @@
 package com.msicraft.zodiacintegrated.Command;
 
-import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.PlayerUtils.PlayerUtil;
+import com.msicraft.zodiacintegrated.Shop.Inventory.ShopInv;
+import com.msicraft.zodiacintegrated.Shop.ShopUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
@@ -54,6 +55,15 @@ public class MainCommand implements CommandExecutor {
                             }
                         }
                     }
+                    case "test" -> {
+                        if (args.length == 1) {
+                            if (sender instanceof Player player) {
+                                ShopInv shopInv = new ShopInv(player);
+                                player.openInventory(shopInv.getInventory());
+                                shopInv.setMainInv(player);
+                            }
+                        }
+                    }
                 }
                 if (args.length == 2) {
                     if (val.equals("guild")) {
@@ -97,27 +107,27 @@ public class MainCommand implements CommandExecutor {
                             switch (guildVar) {
                                 case "register" -> { //zd guild register <player>
                                     if (sender.isOp()) {
-                                        Player player = Bukkit.getPlayer(args[2]);
-                                        if (player != null) {
-                                            ArrayList<String> uuidList = new ArrayList<>(ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player"));
-                                            if (uuidList.contains(player.getUniqueId().toString())) {
-                                                sender.sendMessage(ChatColor.RED + "이미 등록된 플레이어입니다");
-                                            } else {
-                                                uuidList.add(player.getUniqueId().toString());
-                                                sender.sendMessage(ChatColor.GREEN + "등록된 플레이어: " + ChatColor.WHITE + player.getName());
-                                                String tempGuildName = "[" + player.getName() + " 의 임시 길드이름] ";
-                                                String tempPrefixName = player.getName() + " 의 임시 길드이름 ";
-                                                String guildGroupName = player.getName() + "의_길드";
-                                                ZodiacIntegrated.getPlugin().getConfig().set("Identified-Player", uuidList);
-                                                ZodiacIntegrated.getPlugin().saveConfig();
-                                                ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Owner", player.getName());
-                                                ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".ID", player.getUniqueId().toString());
-                                                ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Money", 0);
-                                                ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Name", tempGuildName);
-                                                ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".PrefixName", tempPrefixName);
-                                                guildUtil.createGuildPrefix(guildGroupName, tempGuildName);
-                                                ZodiacIntegrated.streamerGuildData.saveConfig();
-                                            }
+                                        OfflinePlayer player = Bukkit.getOfflinePlayer(args[2]);
+                                        //Player player = Bukkit.getPlayer(args[2]);
+                                        ArrayList<String> uuidList = new ArrayList<>(ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player"));
+                                        if (uuidList.contains(player.getUniqueId().toString())) {
+                                            sender.sendMessage(ChatColor.RED + "이미 등록된 플레이어입니다");
+                                        } else {
+                                            uuidList.add(player.getUniqueId().toString());
+                                            sender.sendMessage(ChatColor.GREEN + "등록된 플레이어: " + ChatColor.WHITE + player.getName());
+                                            String tempGuildName = "[" + player.getName() + " 의 임시 길드이름] ";
+                                            String tempPrefixName = player.getName() + " 의 임시 길드이름 ";
+                                            String guildGroupName = player.getName() + "의_길드";
+                                            ZodiacIntegrated.getPlugin().getConfig().set("Identified-Player", uuidList);
+                                            ZodiacIntegrated.getPlugin().saveConfig();
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Owner", player.getName());
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".ID", player.getUniqueId().toString());
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Money", 0);
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Name", tempGuildName);
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".PrefixName", tempPrefixName);
+                                            guildUtil.createGuildPrefix(guildGroupName, tempGuildName);
+                                            playerUtil.registerWhiteListPlayer(player, player.getUniqueId().toString());
+                                            ZodiacIntegrated.streamerGuildData.saveConfig();
                                         }
                                     }
                                 }
@@ -137,6 +147,7 @@ public class MainCommand implements CommandExecutor {
                                                 ZodiacIntegrated.streamerGuildData.saveConfig();
                                                 String guildGroupName = player.getName() + "의_길드";
                                                 guildUtil.removeGuildPrefix(guildGroupName);
+                                                playerUtil.unRegisterWhiteListPlayer(player);
                                             } else {
                                                 sender.sendMessage(ChatColor.RED + "존재하지 않는 플레이어: " + ChatColor.WHITE + player.getName());
                                             }
@@ -149,6 +160,9 @@ public class MainCommand implements CommandExecutor {
                                                 sender.sendMessage(ChatColor.RED + "제거된 플레이어: " + ChatColor.WHITE + offlinePlayer.getName());
                                                 ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + offlinePlayer.getUniqueId(), null);
                                                 ZodiacIntegrated.streamerGuildData.saveConfig();
+                                                String guildGroupName = offlinePlayer.getName() + "의_길드";
+                                                guildUtil.removeGuildPrefix(guildGroupName);
+                                                playerUtil.unRegisterWhiteListPlayer(offlinePlayer);
                                             } else {
                                                 sender.sendMessage(ChatColor.RED + "존재하지 않는 플레이어: " + ChatColor.WHITE + offlinePlayer.getName());
                                             }
@@ -183,6 +197,7 @@ public class MainCommand implements CommandExecutor {
                                             }
                                             if (guildUtil.isGuildMember(offlinePlayer.getUniqueId(), guildId)) {
                                                 guildUtil.banishMember(offlinePlayer, guildId);
+                                                playerUtil.unRegisterWhiteListPlayer(offlinePlayer);
                                                 player.sendMessage(ChatColor.GREEN + "해당 플레이어를 길드에서 추방하였습니다");
                                             } else {
                                                 player.sendMessage(ChatColor.RED + "길드에 소속되어있지 않는 플레이어이거나 권한을 낮춘 후에 다시 시도해주시기를 바랍니다");

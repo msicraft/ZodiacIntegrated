@@ -3,10 +3,11 @@ package com.msicraft.zodiacintegrated;
 import com.christian34.easyprefix.EasyPrefix;
 import com.msicraft.zodiacintegrated.Command.MainCommand;
 import com.msicraft.zodiacintegrated.Command.TabComplete;
-import com.msicraft.zodiacintegrated.Data.StreamerGuildData;
-import com.msicraft.zodiacintegrated.Data.WhiteListPlayerData;
+import com.msicraft.zodiacintegrated.Shop.Data.ShopData;
+import com.msicraft.zodiacintegrated.Shop.Event.ShopInvClickEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Data.StreamerGuildData;
+import com.msicraft.zodiacintegrated.StreamerGuild.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.Event.PvPDeathPenalty;
-import com.msicraft.zodiacintegrated.Event.WhitelistEvent;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
@@ -37,6 +38,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
     public static WhiteListPlayerData whiteListPlayerData;
     public static EvolutionConfig evolutionConfig;
     public static EvolutionDataConfig evolutionDataConfig;
+    public static ShopData shopData;
     public static UUID developerUUID = UUID.fromString("67bfaabc-6d16-4ad7-90f7-177697c05cee");
 
     private static Economy econ = null;
@@ -53,7 +55,6 @@ public final class ZodiacIntegrated extends JavaPlugin {
         return "[Zodiac Integrated]";
     }
 
-
     @Override
     public void onEnable() {
         plugin = this;
@@ -61,6 +62,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
         whiteListPlayerData = new WhiteListPlayerData(this);
         evolutionConfig = new EvolutionConfig(this);
         evolutionDataConfig = new EvolutionDataConfig(this);
+        shopData = new ShopData(this);
         createFiles();
         final int configVersion = plugin.getConfig().contains("config-version", true) ? plugin.getConfig().getInt("config-version") : -1;
         if (configVersion != 1) {
@@ -81,18 +83,22 @@ public final class ZodiacIntegrated extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " You are using the latest version of streamerGuild.yml");
         }
         final int evolutionConfigVersion = evolutionConfig.getConfig().contains("config-version", true) ? evolutionConfig.getConfig().getInt("config-version") : -1;
-        if (evolutionConfigVersion != -1) {
-            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolution");
+        if (evolutionConfigVersion != 1) {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolution.yml");
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " Created the latest evolution.yml after replacing the old evolution.yml with evolution_old.yml");
             replaceEvolutionConfig();
             evolutionConfig = new EvolutionConfig(this);
+        } else {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " You are using the latest version of evolution.yml");
         }
         final int evolutionDataConfigVersion = evolutionDataConfig.getConfig().contains("config-version", true) ? evolutionDataConfig.getConfig().getInt("config-version") : -1;
-        if (evolutionDataConfigVersion != -1) {
-            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolutionData");
+        if (evolutionDataConfigVersion != 1) {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " You are using the old evolutionData.yml");
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " Created the latest evolutionData.yml after replacing the old evolutionData.yml with evolutionData_old.yml");
             replaceEvolutionDataConfig();
             evolutionDataConfig = new EvolutionDataConfig(this);
+        } else {
+            getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " You are using the latest version of evolutionData.yml");
         }
         if (!setupEconomy()) {
             getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED + " No economy plugin found. Disabling");
@@ -114,10 +120,10 @@ public final class ZodiacIntegrated extends JavaPlugin {
     private void eventsRegister() {
         pluginManager.registerEvents(new PvPDeathPenalty(), this);
         pluginManager.registerEvents(new GuildMainInvEvent(), this);
-        pluginManager.registerEvents(new WhitelistEvent(), this);
         pluginManager.registerEvents(new PrefixChatEditEvent(), this);
         pluginManager.registerEvents(new GuildPlayerJoinEvent(), this);
         pluginManager.registerEvents(new GuildMoneyChatEditEvent(), this);
+        pluginManager.registerEvents(new ShopInvClickEvent(), this);
     }
 
     private void commandsRegister() {

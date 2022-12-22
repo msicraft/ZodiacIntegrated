@@ -1,4 +1,4 @@
-package com.msicraft.zodiacintegrated.Data;
+package com.msicraft.zodiacintegrated.Shop.Data;
 
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,13 +10,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 
-public class WhiteListPlayerData {
+public class ShopData {
 
     private final ZodiacIntegrated plugin;
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
-    public WhiteListPlayerData(ZodiacIntegrated plugin) {
+    public ShopData(ZodiacIntegrated plugin) {
         this.plugin = plugin;
         saveDefaultConfig();
     }
@@ -24,11 +24,11 @@ public class WhiteListPlayerData {
 
     public void reloadConfig() {
         if (this.configFile == null)
-            this.configFile = new File(plugin.getDataFolder(), "whiteListPlayerData.yml");
+            this.configFile = new File(plugin.getDataFolder(), "shopData.yml");
 
         this.dataConfig = YamlConfiguration.loadConfiguration(this.configFile);
 
-        InputStream defaultStream = plugin.getResource("whiteListPlayerData.yml");
+        InputStream defaultStream = plugin.getResource("shopData.yml");
         if (defaultStream != null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
             this.dataConfig.setDefaults(defaultConfig);
@@ -56,10 +56,10 @@ public class WhiteListPlayerData {
 
     public void saveDefaultConfig() {
         if (this.configFile == null)
-            this.configFile = new File(plugin.getDataFolder(), "whiteListPlayerData.yml");
+            this.configFile = new File(plugin.getDataFolder(), "shopData.yml");
 
         if (!this.configFile.exists()) {
-            plugin.saveResource("whiteListPlayerData.yml", false);
+            plugin.saveResource("shopData.yml", false);
         }
 
     }

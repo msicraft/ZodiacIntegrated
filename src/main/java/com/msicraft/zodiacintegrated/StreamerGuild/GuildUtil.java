@@ -20,6 +20,8 @@ public class GuildUtil {
         group.setPrefix(prefixName);
         group.setSuffix("&f:");
         group.setChatColor(Color.WHITE);
+        group.setJoinMessage("%ep_user_prefix%%player% &e님이 게임에 접속하였습니다.");
+        group.setQuitMessage("%ep_user_prefix%%player% &e님이 게임을 종료하였습니다.");
     }
 
     public void removeGuildPrefix(String groupName) {

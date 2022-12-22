@@ -1,4 +1,4 @@
-package com.msicraft.zodiacintegrated.Data;
+package com.msicraft.zodiacintegrated.StreamerGuild.Data;
 
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import org.bukkit.configuration.file.FileConfiguration;
