@@ -43,7 +43,7 @@ public class ShopInvClickEvent implements Listener {
                         PersistentDataContainer selectData = selectMeta.getPersistentDataContainer();
                         if (selectData.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ShopMain"), PersistentDataType.STRING)) {
                             String selectVar = selectData.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ShopMain"), PersistentDataType.STRING);
-                            if (selectVar != null) {
+                            if (selectVar != null && e.isLeftClick()) {
                                 switch (selectVar) {
                                     case "SELL" -> {
                                         player.sendMessage("성공: " +selectVar);

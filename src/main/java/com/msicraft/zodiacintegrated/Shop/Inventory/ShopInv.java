@@ -30,8 +30,6 @@ public class ShopInv implements InventoryHolder {
         shopInv = Bukkit.createInventory(player, 54, Component.text("Shop"));
     }
 
-
-
     public void setMainInv(Player player) {
         setMainIcon(player);
         if (!basicList.isEmpty()) {

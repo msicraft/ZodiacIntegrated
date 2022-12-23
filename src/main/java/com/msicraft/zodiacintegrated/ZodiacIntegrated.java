@@ -7,7 +7,7 @@ import com.msicraft.zodiacintegrated.Shop.Data.ShopData;
 import com.msicraft.zodiacintegrated.Shop.Event.ShopInvClickEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Data.StreamerGuildData;
 import com.msicraft.zodiacintegrated.StreamerGuild.Data.WhiteListPlayerData;
-import com.msicraft.zodiacintegrated.Event.PvPDeathPenalty;
+import com.msicraft.zodiacintegrated.Event.DeathPenalty;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
@@ -118,7 +118,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
     private PluginManager pluginManager = Bukkit.getServer().getPluginManager();
 
     private void eventsRegister() {
-        pluginManager.registerEvents(new PvPDeathPenalty(), this);
+        pluginManager.registerEvents(new DeathPenalty(), this);
         pluginManager.registerEvents(new GuildMainInvEvent(), this);
         pluginManager.registerEvents(new PrefixChatEditEvent(), this);
         pluginManager.registerEvents(new GuildPlayerJoinEvent(), this);

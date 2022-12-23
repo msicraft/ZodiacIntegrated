@@ -42,6 +42,9 @@ public class GuildUtil {
                 break;
             }
         }
+        if (g == null) {
+            g = groupHandler.getGroup("basic");
+        }
         return g;
     }
 

@@ -15,21 +15,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class PvPDeathPenalty implements Listener {
+public class DeathPenalty implements Listener {
 
     private final Random random = new Random();
 
     private final ArrayList<EquipmentSlot> equipmentSlotArrayList = new ArrayList<>(Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND));
 
     @EventHandler
-    public void onPlayerPvPPenalty(PlayerDeathEvent e) {
-        if (ZodiacIntegrated.getPlugin().getConfig().getBoolean("PvPDeathPenalty.Enabled")) {
+    public void onPlayerDeathPenalty(PlayerDeathEvent e) {
+        if (ZodiacIntegrated.getPlugin().getConfig().getBoolean("DeathPenalty.Enabled")) {
             Player player = e.getPlayer();
             Location deathLocation = player.getLocation();
             World world = deathLocation.getWorld();
-            if (ZodiacIntegrated.getPlugin().getConfig().getStringList("PvPDeathPenalty.Whitelist").contains(world.getName())) {
-                int maxLose = ZodiacIntegrated.getPlugin().getConfig().getInt("PvPDeathPenalty.Max-LoseCount");
-                int maxTryCount = ZodiacIntegrated.getPlugin().getConfig().getInt("PvPDeathPenalty.Max-TryCount");
+            if (ZodiacIntegrated.getPlugin().getConfig().getStringList("DeathPenalty.Whitelist").contains(world.getName())) {
+                int maxLose = ZodiacIntegrated.getPlugin().getConfig().getInt("DeathPenalty.Max-LoseCount");
+                int maxTryCount = ZodiacIntegrated.getPlugin().getConfig().getInt("DeathPenalty.Max-TryCount");
                 int maxDropCount = random.nextInt(maxLose);
                 int dropCount = 0;
                 ItemStack airItemStack = new ItemStack(Material.AIR, 1);
@@ -47,7 +47,7 @@ public class PvPDeathPenalty implements Listener {
                     }
                 }
                 if (dropCount <= maxDropCount) {
-                    double weightPercent = ZodiacIntegrated.getPlugin().getConfig().getDouble("PvPDeathPenalty.Additional-Percent");
+                    double weightPercent = ZodiacIntegrated.getPlugin().getConfig().getDouble("DeathPenalty.Additional-Percent");
                     if (random.nextDouble() <= weightPercent) {
                         int a = random.nextInt(equipmentSlotArrayList.size());
                         ItemStack itemStack = player.getInventory().getItem(equipmentSlotArrayList.get(a));

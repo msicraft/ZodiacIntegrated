@@ -41,7 +41,7 @@ public class GuildPlayerJoinEvent implements Listener {
                 User user = ZodiacIntegrated.getEasyPrefix().getUser(player);
                 if (guildId != null) {
                     Group group = guildUtil.getGroup(player);
-                    if (user.getGroup() != group) {
+                    if (group != null) {
                         user.setGroup(group, true);
                     }
                 } else {

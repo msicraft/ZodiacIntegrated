@@ -189,7 +189,7 @@ public class MainCommand implements CommandExecutor {
                                 case "banish" -> { //zd guild banish <player>
                                     if (sender instanceof Player player) {
                                         String guildId = guildUtil.getContainGuildID(player);
-                                        if (guildUtil.hasGuildPermission(player.getUniqueId(), guildId)) {
+                                        if (guildUtil.isGuildOwner(player.getUniqueId())) {
                                             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[2]);
                                             if (player.getUniqueId() == offlinePlayer.getUniqueId()) {
                                                 player.sendMessage(ChatColor.RED + "자기 자신을 추방시킬 수 없습니다");
