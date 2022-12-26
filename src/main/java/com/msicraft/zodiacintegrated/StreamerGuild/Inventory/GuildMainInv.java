@@ -4,11 +4,10 @@ import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import it.unimi.dsi.fastutil.Hash;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -30,6 +29,19 @@ public class GuildMainInv implements InventoryHolder {
         guildMainInv.clear();
         createSelectMenu();
         setGuildIcon(player);
+    }
+
+    public void setGuildMemberRank(Player player) {
+        setGuildIcon(player);
+        ItemStack itemStack;
+        itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicLoreList, "ZD-Guild-RankManagement", "Back");
+        guildMainInv.setItem(45, itemStack);
+        itemStack = createNormalItem(Material.DIAMOND_SWORD, ChatColor.WHITE + "부 마스터 승급",basicLoreList ,"ZD-Guild-RankManagement", "RankUp-SubOwner");
+        hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
+        guildMainInv.setItem(19, itemStack);
+        itemStack = createNormalItem(Material.GOLDEN_SWORD, ChatColor.WHITE + "부 마스터 강등",basicLoreList ,"ZD-Guild-RankManagement", "RankDown-SubOwner");
+        hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
+        guildMainInv.setItem(20, itemStack);
     }
 
     public void setGuildMoneyManagementMenu(Player player) {
@@ -61,6 +73,15 @@ public class GuildMainInv implements InventoryHolder {
         guildMainInv.setItem(45, itemStack);
         itemStack = createNormalItem(Material.NAME_TAG, ChatColor.WHITE + "길드 이름 변경", basicLoreList, "ZD-GuildManagement", "Change_Name");
         guildMainInv.setItem(19, itemStack);
+        itemStack = createNormalItem(Material.DIAMOND_SWORD, ChatColor.WHITE + "길드 직책 변경", basicLoreList, "ZD-GuildManagement", "Change_Rank");
+        hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
+        guildMainInv.setItem(20, itemStack);
+    }
+
+    private void hideItemFlag(ItemStack itemStack, ItemFlag itemFlag) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(itemFlag);
+        itemStack.setItemMeta(itemMeta);
     }
 
     public static HashMap<UUID, String> otherGuild_page = new HashMap<>(); //"page:<count>"
@@ -95,6 +116,12 @@ public class GuildMainInv implements InventoryHolder {
             itemStack = new ItemStack(Material.PAPER, 1);
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.displayName(Component.text(ChatColor.translateAlternateColorCodes('&', getGuildName)));
+            String guildOwnerName = ZodiacIntegrated.whiteListPlayerData.getConfig().getString("WhiteList." + uuid + ".Name");
+            if (guildOwnerName == null) {
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                guildOwnerName = offlinePlayer.getName();
+            }
+            loreList.add(Component.text(ChatColor.GREEN + "길드 마스터: " + ChatColor.WHITE + guildOwnerName));
             loreList.add(Component.text(ChatColor.GREEN + "길드 인원: " + ChatColor.WHITE + guildUtil.getGuildMemberList(String.valueOf(uuid)).size() + " 명"));
             loreList.add(Component.text(ChatColor.GREEN + "길드 자금: " + ChatColor.WHITE + guildUtil.getGuildMoney(String.valueOf(uuid))));
             itemMeta.lore(loreList);
@@ -173,6 +200,10 @@ public class GuildMainInv implements InventoryHolder {
             UUID uuid = playerUUIDList.get(a);
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             itemStack = getMemberPlayerHead(offlinePlayer);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            PersistentDataContainer data = itemMeta.getPersistentDataContainer();
+            data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING, offlinePlayer.getName());
+            itemStack.setItemMeta(itemMeta);
             guildMainInv.setItem(slot, itemStack);
             count++;
             if (count >= max) {
@@ -182,6 +213,15 @@ public class GuildMainInv implements InventoryHolder {
     }
 
     private ItemStack getMemberPlayerHead(OfflinePlayer offlinePlayer) {
+        String guildId = ZodiacIntegrated.whiteListPlayerData.getConfig().getString("WhiteList." + offlinePlayer.getUniqueId() + ".GuildId");
+        if (guildId == null) {
+            Player player = offlinePlayer.getPlayer();
+            if (player != null) {
+                guildId = guildUtil.getContainGuildID(player);
+            } else {
+                guildId = "null";
+            }
+        }
         if (!basicLoreList.isEmpty()) {
             basicLoreList.clear();
         }
@@ -196,6 +236,11 @@ public class GuildMainInv implements InventoryHolder {
         } else {
             basicLoreList.add(Component.text(ChatColor.WHITE + "상태:" + ChatColor.RED + " 오프라인"));
         }
+        String getRank = guildUtil.getGuildRank(guildId, offlinePlayer);
+        basicLoreList.add(Component.text(""));
+        basicLoreList.add(Component.text(ChatColor.WHITE + "직책: " + ChatColor.GREEN + getRank));
+        basicLoreList.add(Component.text(""));
+        basicLoreList.add(Component.text(ChatColor.YELLOW + "클릭시 이름 복사"));
         skullMeta.lore(basicLoreList);
         itemStack.setItemMeta(skullMeta);
         return itemStack;
@@ -254,9 +299,9 @@ public class GuildMainInv implements InventoryHolder {
         itemStack = createNormalItem(Material.GRINDSTONE, "길드 관리", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-Management");
         guildMainInv.setItem(28, itemStack);
         itemStack = createNormalItem(Material.ENCHANTED_BOOK, ChatColor.WHITE + "길드 목록", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-OtherGuild");
-        guildMainInv.setItem(20, itemStack);
+        guildMainInv.setItem(21, itemStack);
         itemStack = createNormalItem(Material.DIAMOND, "길드 자금 관리", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-MoneyManagement");
-        guildMainInv.setItem(29, itemStack);
+        guildMainInv.setItem(30, itemStack);
     }
 
     private void setGuildIcon(Player player) {
@@ -284,18 +329,6 @@ public class GuildMainInv implements InventoryHolder {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         dataContainer.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), dataTag), PersistentDataType.STRING, data);
         itemStack.setItemMeta(itemMeta);
-        return itemStack;
-    }
-
-    private ItemStack getPlayerHead(UUID uuid) {
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD, 1);
-        SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        if (!skullMeta.hasOwner()) {
-            skullMeta.setOwningPlayer(offlinePlayer);
-        }
-        skullMeta.displayName(Component.text(ChatColor.WHITE + offlinePlayer.getName()));
-        itemStack.setItemMeta(skullMeta);
         return itemStack;
     }
 

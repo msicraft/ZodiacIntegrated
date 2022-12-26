@@ -1,7 +1,8 @@
 package com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event;
 
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
-import com.msicraft.zodiacintegrated.StreamerGuild.Event.PrefixChatEditEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPrefixChatEditEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildRankManageChatEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
@@ -16,6 +17,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -136,6 +140,14 @@ public class GuildMainInvEvent implements Listener {
                                         player.openInventory(guildMainInv.getInventory());
                                         guildMainInv.setGuildNameChangeMenu(player);
                                     }
+                                    case "Change_Rank" -> {
+                                        if (guildUtil.isGuildOwner(player.getUniqueId())) {
+                                            player.openInventory(guildMainInv.getInventory());
+                                            guildMainInv.setGuildMemberRank(player);
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "길드 마스터만 가능합니다.");
+                                        }
+                                    }
                                 }
                             }
                         } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-GuildPrefixEdit"), PersistentDataType.STRING)) {
@@ -148,8 +160,8 @@ public class GuildMainInvEvent implements Listener {
                                     }
                                     case "Change_Prefix" -> {
                                         player.closeInventory();
-                                        PrefixChatEditEvent.isPrefixChatEdit.put(player.getUniqueId(), true);
-                                        PrefixChatEditEvent.prefixEditVar.put(player.getUniqueId(), var);
+                                        GuildPrefixChatEditEvent.isPrefixChatEdit.put(player.getUniqueId(), true);
+                                        GuildPrefixChatEditEvent.prefixEditVar.put(player.getUniqueId(), var);
                                         player.sendMessage(ChatColor.YELLOW + "====================");
                                         player.sendMessage(ChatColor.GRAY + " 길드 칭호 이름을 입력해주세요 ");
                                         player.sendMessage(ChatColor.GRAY + " 'cancel' 입력시 취소 ");
@@ -159,10 +171,10 @@ public class GuildMainInvEvent implements Listener {
                                         player.closeInventory();
                                         player.sendMessage(ChatColor.YELLOW + "====================");
                                         player.sendMessage(ChatColor.GRAY + " 길드 칭호 색상을 입력해주세요 ");
-                                        player.sendMessage(ChatColor.GRAY + " 사용 가능한 색: " + PrefixChatEditEvent.getAvailableColorName());
+                                        player.sendMessage(ChatColor.GRAY + " 사용 가능한 색: " + GuildPrefixChatEditEvent.getAvailableColorName());
                                         player.sendMessage(ChatColor.GRAY + " 'cancel' 입력시 취소 ");
                                         player.sendMessage(ChatColor.YELLOW + "====================");
-                                        PrefixChatEditEvent.isPrefixChatColorEdit.put(player.getUniqueId(), true);
+                                        GuildPrefixChatEditEvent.isPrefixChatColorEdit.put(player.getUniqueId(), true);
                                     }
                                 }
                             }
@@ -248,6 +260,43 @@ public class GuildMainInvEvent implements Listener {
                                         }
                                     }
                                 }
+                            }
+                        } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-RankManagement"), PersistentDataType.STRING)) {
+                            String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-RankManagement"), PersistentDataType.STRING);
+                            if (var != null && e.isLeftClick()) {
+                                switch (var) {
+                                    case "Back" -> {
+                                        player.openInventory(guildMainInv.getInventory());
+                                        guildMainInv.setGuildManagement(player);
+                                    }
+                                    case "RankUp-SubOwner" -> {
+                                        player.closeInventory();
+                                        player.sendMessage(ChatColor.YELLOW + "==============================");
+                                        player.sendMessage(ChatColor.GRAY + " 승급시킬 멤버의 이름을 입력해주세요.");
+                                        player.sendMessage(ChatColor.GRAY + " 'cancel' 입력시 취소 ");
+                                        player.sendMessage(ChatColor.YELLOW + "==============================");
+                                        GuildRankManageChatEvent.isRankEdit.put(player.getUniqueId(), true);
+                                        GuildRankManageChatEvent.rankEditVar.put(player.getUniqueId(), var);
+                                    }
+                                    case "RankDown-SubOwner" -> {
+                                        player.closeInventory();
+                                        player.sendMessage(ChatColor.YELLOW + "==============================");
+                                        player.sendMessage(ChatColor.GRAY + " 강등시킬 멤버의 이름을 입력해주세요.");
+                                        player.sendMessage(ChatColor.GRAY + " 'cancel' 입력시 취소 ");
+                                        player.sendMessage(ChatColor.YELLOW + "==============================");
+                                        GuildRankManageChatEvent.isRankEdit.put(player.getUniqueId(), true);
+                                        GuildRankManageChatEvent.rankEditVar.put(player.getUniqueId(), var);
+                                    }
+                                }
+                            }
+                        } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING)) {
+                            String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING);
+                            if (var != null && e.isLeftClick()) {
+                                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                                Clipboard clipboard = toolkit.getSystemClipboard();
+                                StringSelection strSel = new StringSelection(var);
+                                clipboard.setContents(strSel, null);
+                                player.sendMessage(ChatColor.GREEN + "플레이어의 이름이 복사되었습니다.");
                             }
                         }
                     }

@@ -97,6 +97,19 @@ public class GuildUtil {
         return check;
     }
 
+    public String getGuildRank(String guildId, OfflinePlayer offlinePlayer) {
+        String rank = "멤버";
+        UUID uuid = offlinePlayer.getUniqueId();
+        if (isGuildOwner(uuid)) {
+            rank = "마스터";
+        } else if (isGuildSubOwner(uuid, guildId)) {
+            rank = "부 마스터";
+        } else if (isGuildMember(uuid, guildId)) {
+            rank = "멤버";
+        }
+        return rank;
+    }
+
     public String getGuildName(String guildId) {
         String name = null;
         if (ZodiacIntegrated.streamerGuildData.getConfig().contains("Guild." + guildId + ".Name")) {
@@ -191,6 +204,49 @@ public class GuildUtil {
         double resultFloor = Math.floor(result);
         ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId + ".Money", resultFloor);
         ZodiacIntegrated.streamerGuildData.saveConfig();
+    }
+
+    public void guildRankChange(String rankVar, OfflinePlayer offlinePlayer, String guildId) {
+        ArrayList<String> subOwnerUUIDSList = new ArrayList<>(ZodiacIntegrated.streamerGuildData.getConfig().getStringList("Guild." + guildId + ".SubOwner"));
+        ArrayList<String> memberUUIDSList = new ArrayList<>(ZodiacIntegrated.streamerGuildData.getConfig().getStringList("Guild." + guildId + ".Member"));
+        boolean check = false;
+        switch (rankVar) {
+            case "RankUp-SubOwner" -> {
+                int count = 0;
+                for (String s : memberUUIDSList) {
+                    if (s.equals(offlinePlayer.getUniqueId().toString())) {
+                        check = true;
+                        break;
+                    } else {
+                        count++;
+                    }
+                }
+                if (check) {
+                    memberUUIDSList.remove(count);
+                    subOwnerUUIDSList.add(offlinePlayer.getUniqueId().toString());
+                }
+            }
+            case "RankDown-SubOwner" -> {
+                int count = 0;
+                for (String s : subOwnerUUIDSList) {
+                    if (s.equals(offlinePlayer.getUniqueId().toString())) {
+                        check = true;
+                        break;
+                    } else {
+                        count++;
+                    }
+                }
+                if (check) {
+                    subOwnerUUIDSList.remove(count);
+                    memberUUIDSList.add(offlinePlayer.getUniqueId().toString());
+                }
+            }
+        }
+        if (check) {
+            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId +".Member", memberUUIDSList);
+            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + guildId +".SubOwner", subOwnerUUIDSList);
+            ZodiacIntegrated.streamerGuildData.saveConfig();
+        }
     }
 
 }

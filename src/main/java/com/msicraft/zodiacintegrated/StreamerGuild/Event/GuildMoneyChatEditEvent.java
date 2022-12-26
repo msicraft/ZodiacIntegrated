@@ -41,52 +41,46 @@ public class GuildMoneyChatEditEvent implements Listener {
                     String guildId = guildUtil.getContainGuildID(player);
                     String getChat = plainText.serialize(component);
                     if (!getChat.equals("cancel")) {
+                        double getChatBalance = 0;
                         String replaceChat = getChat.replaceAll("[^0-9]", "");
-                        double getPlayerBalance = economy.getBalance(player);
-                        double getChatBalance = Double.parseDouble(replaceChat);
-                        double getGuildMoney = guildUtil.getGuildMoney(guildId);
-                        switch (editVar) {
-                            case "ADD-MONEY" -> {
-                                if (getPlayerBalance - getChatBalance >= 0) {
-                                    economy.withdrawPlayer(player, getChatBalance);
-                                    guildUtil.addGuildMoney(guildId, getChatBalance);
-                                    player.sendMessage(ChatColor.GREEN + "길드에 자금이 추가되었습니다.");
-                                    player.sendMessage(ChatColor.GREEN + "추가된 자금: " + ChatColor.WHITE + getChatBalance);
-                                } else {
-                                    player.sendMessage(ChatColor.RED + "충분한 돈이 없습니다.");
+                        try {
+                            getChatBalance = Double.parseDouble(replaceChat);
+                            double getPlayerBalance = economy.getBalance(player);
+                            double getGuildMoney = guildUtil.getGuildMoney(guildId);
+                            switch (editVar) {
+                                case "ADD-MONEY" -> {
+                                    if (getPlayerBalance - getChatBalance >= 0) {
+                                        economy.withdrawPlayer(player, getChatBalance);
+                                        guildUtil.addGuildMoney(guildId, getChatBalance);
+                                        player.sendMessage(ChatColor.GREEN + "길드에 자금이 추가되었습니다.");
+                                        player.sendMessage(ChatColor.GREEN + "추가된 자금: " + ChatColor.WHITE + getChatBalance);
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "충분한 돈이 없습니다.");
+                                    }
                                 }
-                                moneyEditVar.put(player.getUniqueId(), null);
-                                isMoneyChatEdit.put(player.getUniqueId(), false);
-                                Bukkit.getScheduler().runTaskLater(ZodiacIntegrated.getPlugin(), () -> {
-                                    player.openInventory(guildMainInv.getInventory());
-                                    guildMainInv.setGuildMoneyManagementMenu(player);
-                                }, 1L);
-                            }
-                            case "REMOVE-MONEY" -> {
-                                if (getGuildMoney - getChatBalance >= 0) {
-                                    guildUtil.removeGuildMoney(guildId, getChatBalance);
-                                    economy.depositPlayer(player, getChatBalance);
-                                    player.sendMessage(ChatColor.GREEN + "길드에서 자금을 찾았습니다.");
-                                    player.sendMessage(ChatColor.GREEN + "획득한 자금: " + ChatColor.WHITE + getChatBalance);
-                                } else {
-                                    player.sendMessage(ChatColor.RED + "길드에 충분한 자금이 없습니다.");
+                                case "REMOVE-MONEY" -> {
+                                    if (getGuildMoney - getChatBalance >= 0) {
+                                        guildUtil.removeGuildMoney(guildId, getChatBalance);
+                                        economy.depositPlayer(player, getChatBalance);
+                                        player.sendMessage(ChatColor.GREEN + "길드에서 자금을 찾았습니다.");
+                                        player.sendMessage(ChatColor.GREEN + "획득한 자금: " + ChatColor.WHITE + getChatBalance);
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "길드에 충분한 자금이 없습니다.");
+                                    }
+
                                 }
-                                moneyEditVar.put(player.getUniqueId(), null);
-                                isMoneyChatEdit.put(player.getUniqueId(), false);
-                                Bukkit.getScheduler().runTaskLater(ZodiacIntegrated.getPlugin(), () -> {
-                                    player.openInventory(guildMainInv.getInventory());
-                                    guildMainInv.setGuildMoneyManagementMenu(player);
-                                }, 1L);
                             }
+                        } catch (NumberFormatException numE) {
+                            //numE.printStackTrace();
+                            player.sendMessage(ChatColor.RED + "숫자를 입력해주세요");
                         }
-                    } else {
-                        moneyEditVar.put(player.getUniqueId(), null);
-                        isMoneyChatEdit.put(player.getUniqueId(), false);
-                        Bukkit.getScheduler().runTaskLater(ZodiacIntegrated.getPlugin(), () -> {
-                            player.openInventory(guildMainInv.getInventory());
-                            guildMainInv.setGuildMoneyManagementMenu(player);
-                        }, 1L);
                     }
+                    moneyEditVar.put(player.getUniqueId(), null);
+                    isMoneyChatEdit.put(player.getUniqueId(), false);
+                    Bukkit.getScheduler().runTaskLater(ZodiacIntegrated.getPlugin(), () -> {
+                        player.openInventory(guildMainInv.getInventory());
+                        guildMainInv.setGuildMoneyManagementMenu(player);
+                    }, 1L);
                 }
             }
         }

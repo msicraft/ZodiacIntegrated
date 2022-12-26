@@ -12,7 +12,8 @@ import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPlayerJoinEvent;
-import com.msicraft.zodiacintegrated.StreamerGuild.Event.PrefixChatEditEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPrefixChatEditEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildRankManageChatEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event.GuildMainInvEvent;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -120,10 +121,11 @@ public final class ZodiacIntegrated extends JavaPlugin {
     private void eventsRegister() {
         pluginManager.registerEvents(new DeathPenalty(), this);
         pluginManager.registerEvents(new GuildMainInvEvent(), this);
-        pluginManager.registerEvents(new PrefixChatEditEvent(), this);
+        pluginManager.registerEvents(new GuildPrefixChatEditEvent(), this);
         pluginManager.registerEvents(new GuildPlayerJoinEvent(), this);
         pluginManager.registerEvents(new GuildMoneyChatEditEvent(), this);
         pluginManager.registerEvents(new ShopInvClickEvent(), this);
+        pluginManager.registerEvents(new GuildRankManageChatEvent(), this);
     }
 
     private void commandsRegister() {

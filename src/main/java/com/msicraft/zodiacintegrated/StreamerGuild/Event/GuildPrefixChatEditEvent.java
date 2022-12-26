@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public class PrefixChatEditEvent implements Listener {
+public class GuildPrefixChatEditEvent implements Listener {
 
     private final GuildUtil guildUtil = new GuildUtil();
 

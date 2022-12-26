@@ -48,6 +48,7 @@ public class GuildPlayerJoinEvent implements Listener {
                     Group group = ZodiacIntegrated.getEasyPrefix().getGroupHandler().getGroup("basic");
                     user.setGroup(group, true);
                 }
+                player.sendMessage(ChatColor.GREEN + "첫 접속으로 인해 자동으로 소속되어있는 길드의 칭호가 적용되었습니다.");
                 ZodiacIntegrated.whiteListPlayerData.getConfig().set("WhiteList." + player.getUniqueId() + ".FirstJoin", false);
                 ZodiacIntegrated.whiteListPlayerData.saveConfig();
             }, 20L);

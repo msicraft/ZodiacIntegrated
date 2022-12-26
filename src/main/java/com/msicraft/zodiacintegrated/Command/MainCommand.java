@@ -122,6 +122,8 @@ public class MainCommand implements CommandExecutor {
                                             ZodiacIntegrated.getPlugin().saveConfig();
                                             ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Owner", player.getName());
                                             ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".ID", player.getUniqueId().toString());
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Level", 1);
+                                            ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".LevelExp", 0);
                                             ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Money", 0);
                                             ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".Name", tempGuildName);
                                             ZodiacIntegrated.streamerGuildData.getConfig().set("Guild." + player.getUniqueId() + ".PrefixName", tempPrefixName);
