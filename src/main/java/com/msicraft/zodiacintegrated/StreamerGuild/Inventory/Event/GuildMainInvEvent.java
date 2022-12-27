@@ -5,6 +5,7 @@ import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPrefixChatEditEven
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildRankManageChatEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
+import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildStorageInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 public class GuildMainInvEvent implements Listener {
 
-    private GuildUtil guildUtil = new GuildUtil();
+    private final GuildUtil guildUtil = new GuildUtil();
 
     public static HashMap<UUID, String> memberPageCount = new HashMap<>(); //"page:<count>"
     public static HashMap<UUID, String> otherGuildPageCount = new HashMap<>(); //"page:<count>"
@@ -52,6 +53,7 @@ public class GuildMainInvEvent implements Listener {
                         PersistentDataContainer data = itemMeta.getPersistentDataContainer();
                         if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-GuildMainMenu"), PersistentDataType.STRING)) {
                             String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-GuildMainMenu"), PersistentDataType.STRING);
+                            GuildStorageInv guildStorageInv = new GuildStorageInv(player, guildId);
                             if (var != null && e.isLeftClick()) {
                                 switch (var) {
                                     case "ZD-Guild-MemberList" -> {
@@ -74,6 +76,10 @@ public class GuildMainInvEvent implements Listener {
                                     case "ZD-Guild-MoneyManagement" -> {
                                         player.openInventory(guildMainInv.getInventory());
                                         guildMainInv.setGuildMoneyManagementMenu(player);
+                                    }
+                                    case "ZD-Guild-Storage" -> {
+                                        player.openInventory(guildStorageInv.getInventory());
+                                        guildStorageInv.loadGuildStorage(guildId);
                                     }
                                 }
                             }

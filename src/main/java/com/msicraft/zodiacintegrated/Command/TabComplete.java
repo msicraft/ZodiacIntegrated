@@ -27,6 +27,7 @@ public class TabComplete implements TabCompleter {
             if (args.length == 2 && args[0].equals("admin") && sender.isOp()) {
                 List<String> arguments = new ArrayList<>();
                 arguments.add("menu");
+                arguments.add("update-storage");
                 return arguments;
             }
             if (args.length == 2 && args[0].equals("guild") && sender.isOp()) {

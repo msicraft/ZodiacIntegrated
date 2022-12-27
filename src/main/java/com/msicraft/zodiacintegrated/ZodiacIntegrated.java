@@ -3,18 +3,21 @@ package com.msicraft.zodiacintegrated;
 import com.christian34.easyprefix.EasyPrefix;
 import com.msicraft.zodiacintegrated.Command.MainCommand;
 import com.msicraft.zodiacintegrated.Command.TabComplete;
-import com.msicraft.zodiacintegrated.Shop.Data.ShopData;
-import com.msicraft.zodiacintegrated.Shop.Event.ShopInvClickEvent;
-import com.msicraft.zodiacintegrated.StreamerGuild.Data.StreamerGuildData;
-import com.msicraft.zodiacintegrated.StreamerGuild.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.Event.DeathPenalty;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
 import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
+import com.msicraft.zodiacintegrated.Shop.Data.ShopData;
+import com.msicraft.zodiacintegrated.Shop.Event.ShopInvClickEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Data.GuildStorageData;
+import com.msicraft.zodiacintegrated.StreamerGuild.Data.StreamerGuildData;
+import com.msicraft.zodiacintegrated.StreamerGuild.Data.WhiteListPlayerData;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildMoneyChatEditEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPlayerJoinEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildPrefixChatEditEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Event.GuildRankManageChatEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.GuildStorageUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event.GuildMainInvEvent;
+import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event.GuildStorageEvent;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +25,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public final class ZodiacIntegrated extends JavaPlugin {
@@ -39,6 +45,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
     public static WhiteListPlayerData whiteListPlayerData;
     public static EvolutionConfig evolutionConfig;
     public static EvolutionDataConfig evolutionDataConfig;
+    public static GuildStorageData guildStorageData;
     public static ShopData shopData;
     public static UUID developerUUID = UUID.fromString("67bfaabc-6d16-4ad7-90f7-177697c05cee");
 
@@ -56,6 +63,9 @@ public final class ZodiacIntegrated extends JavaPlugin {
         return "[Zodiac Integrated]";
     }
 
+    private final GuildStorageUtil guildStorageUtil = new GuildStorageUtil();
+    public static HashMap<String, HashMap<Integer, ItemStack>> guildStorage = new HashMap<>();
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -63,6 +73,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
         whiteListPlayerData = new WhiteListPlayerData(this);
         evolutionConfig = new EvolutionConfig(this);
         evolutionDataConfig = new EvolutionDataConfig(this);
+        guildStorageData = new GuildStorageData(this);
         shopData = new ShopData(this);
         createFiles();
         final int configVersion = plugin.getConfig().contains("config-version", true) ? plugin.getConfig().getInt("config-version") : -1;
@@ -108,15 +119,23 @@ public final class ZodiacIntegrated extends JavaPlugin {
         }
         eventsRegister();
         commandsRegister();
+        List<String> guildIdList = ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player");
+        for (String guildId : guildIdList) {
+            guildStorageUtil.loadYamlToStorageMap(guildId);
+        }
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + " Plugin Enable");
     }
 
     @Override
     public void onDisable() {
+        List<String> guildIdList = ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player");
+        for (String guildId : guildIdList) {
+            guildStorageUtil.saveStorageMapToYaml(guildId);
+        }
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + getPrefix() + ChatColor.RED +" Plugin Disable");
     }
 
-    private PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+    private final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
 
     private void eventsRegister() {
         pluginManager.registerEvents(new DeathPenalty(), this);
@@ -126,6 +145,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
         pluginManager.registerEvents(new GuildMoneyChatEditEvent(), this);
         pluginManager.registerEvents(new ShopInvClickEvent(), this);
         pluginManager.registerEvents(new GuildRankManageChatEvent(), this);
+        pluginManager.registerEvents(new GuildStorageEvent(), this);
     }
 
     private void commandsRegister() {

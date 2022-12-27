@@ -2,18 +2,22 @@ package com.msicraft.zodiacintegrated.StreamerGuild.Inventory;
 
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
-import it.unimi.dsi.fastutil.Hash;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class GuildMainInv implements InventoryHolder {
 
@@ -299,9 +303,11 @@ public class GuildMainInv implements InventoryHolder {
         itemStack = createNormalItem(Material.GRINDSTONE, "길드 관리", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-Management");
         guildMainInv.setItem(28, itemStack);
         itemStack = createNormalItem(Material.ENCHANTED_BOOK, ChatColor.WHITE + "길드 목록", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-OtherGuild");
-        guildMainInv.setItem(21, itemStack);
+        guildMainInv.setItem(25, itemStack);
         itemStack = createNormalItem(Material.DIAMOND, "길드 자금 관리", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-MoneyManagement");
-        guildMainInv.setItem(30, itemStack);
+        guildMainInv.setItem(29, itemStack);
+        itemStack = createNormalItem(Material.CHEST, "길드 창고", basicLoreList, "ZD-GuildMainMenu", "ZD-Guild-Storage");
+        guildMainInv.setItem(20, itemStack);
     }
 
     private void setGuildIcon(Player player) {
