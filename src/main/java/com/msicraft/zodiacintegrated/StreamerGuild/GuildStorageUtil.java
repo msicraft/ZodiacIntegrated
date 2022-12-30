@@ -91,6 +91,7 @@ public class GuildStorageUtil {
             ItemStack itemStack = player.getInventory().getItem(a);
             if (itemStack == null) {
                 slot = a;
+                break;
             }
 
         }

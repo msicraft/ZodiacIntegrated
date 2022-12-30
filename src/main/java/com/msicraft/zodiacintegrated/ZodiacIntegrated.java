@@ -1,6 +1,8 @@
 package com.msicraft.zodiacintegrated;
 
 import com.christian34.easyprefix.EasyPrefix;
+import com.msicraft.zodiacintegrated.Admin.Event.AdminInvChatEvent;
+import com.msicraft.zodiacintegrated.Admin.Event.AdminInvEvent;
 import com.msicraft.zodiacintegrated.Command.MainCommand;
 import com.msicraft.zodiacintegrated.Command.TabComplete;
 import com.msicraft.zodiacintegrated.Event.DeathPenalty;
@@ -65,6 +67,8 @@ public final class ZodiacIntegrated extends JavaPlugin {
 
     private final GuildStorageUtil guildStorageUtil = new GuildStorageUtil();
     public static HashMap<String, HashMap<Integer, ItemStack>> guildStorage = new HashMap<>();
+
+    public static HashMap<UUID, HashMap<Integer, ItemStack>> shopStorageData = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -146,6 +150,8 @@ public final class ZodiacIntegrated extends JavaPlugin {
         pluginManager.registerEvents(new ShopInvClickEvent(), this);
         pluginManager.registerEvents(new GuildRankManageChatEvent(), this);
         pluginManager.registerEvents(new GuildStorageEvent(), this);
+        pluginManager.registerEvents(new AdminInvEvent(), this);
+        pluginManager.registerEvents(new AdminInvChatEvent(), this);
     }
 
     private void commandsRegister() {

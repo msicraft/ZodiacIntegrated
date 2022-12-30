@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ShopInv implements InventoryHolder {
@@ -28,6 +29,42 @@ public class ShopInv implements InventoryHolder {
 
     public ShopInv(Player player) {
         shopInv = Bukkit.createInventory(player, 54, Component.text("Shop"));
+    }
+
+    public void loadShopStorage(Player player) {
+        setMainIcon(player);
+        sellInv(player);
+        HashMap<Integer, ItemStack> itemMaps = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
+        for (int a = 9; a<45; a++) {
+            ItemStack itemStack = itemMaps.get(a);
+            shopInv.setItem(a, itemStack);
+        }
+    }
+
+    public void sellInv(Player player) {
+        setMainIcon(player);
+        if (!basicList.isEmpty()) {
+            basicList.clear();
+        }
+        itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicList, "ZD-Shop-Sell", "Back");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(45, itemStack);
+        itemStack = createNormalItem(Material.STONE_BUTTON, "판매 확인", basicList, "ZD-Shop-Sell", "Sell");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(53, itemStack);
+        ItemStack tempItem = createNormalItem(Material.BLACK_STAINED_GLASS_PANE, "", basicList, "ZD-Shop-Sell", "null");
+        addItemData(tempItem, "Shop-FixItem", "FIX");
+        for (int a = 46; a<54; a++) {
+            ItemStack stack = shopInv.getItem(a);
+            if (stack == null) {
+                shopInv.setItem(a, tempItem);
+            }
+        }
+        HashMap<Integer, ItemStack> itemMaps = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
+        for (int a = 9; a<45; a++) {
+            ItemStack itemStack = itemMaps.get(a);
+            shopInv.setItem(a, itemStack);
+        }
     }
 
     public void setMainInv(Player player) {
@@ -50,6 +87,17 @@ public class ShopInv implements InventoryHolder {
         itemStack = createNormalItem(Material.BOOK, "정보", basicList, "ShopMain", player.getUniqueId().toString());
         addItemData(itemStack, "Shop-FixItem", "FIX");
         shopInv.setItem(4, itemStack);
+        if (!basicList.isEmpty()) {
+            basicList.clear();
+        }
+        ItemStack tempItem = createNormalItem(Material.BLACK_STAINED_GLASS_PANE, "", basicList, "ZD-Shop-Sell", "null");
+        addItemData(tempItem, "Shop-FixItem", "FIX");
+        for (int a = 0; a<9; a++) {
+            ItemStack stack = shopInv.getItem(a);
+            if (stack == null) {
+                shopInv.setItem(a, tempItem);
+            }
+        }
     }
 
     private ItemStack createNormalItem(Material material, String name, List<Component> list, String dataTag, String data) {

@@ -1,29 +1,27 @@
 package com.msicraft.zodiacintegrated.Command;
 
+import com.msicraft.zodiacintegrated.Admin.Inventory.AdminInv;
 import com.msicraft.zodiacintegrated.PlayerUtils.PlayerUtil;
+import com.msicraft.zodiacintegrated.Shop.Inventory.ShopInv;
+import com.msicraft.zodiacintegrated.Shop.ShopUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildStorageUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class MainCommand implements CommandExecutor {
 
     private final GuildUtil guildUtil = new GuildUtil();
     private final PlayerUtil playerUtil = new PlayerUtil();
     private final GuildStorageUtil guildStorageUtil = new GuildStorageUtil();
+    private final ShopUtil shopUtil = new ShopUtil();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -59,18 +57,20 @@ public class MainCommand implements CommandExecutor {
                             }
                         }
                     }
-                    case "test" -> {
-                        if (args.length == 1) {
-                            if (sender instanceof Player player) {
-                                ItemStack itemStack = new ItemStack(Material.AIR, 1);
-                                HashMap<Integer, ItemStack> itemMaps = new HashMap<>(45);
-                                for (int a = 0; a<45; a++) {
-                                    itemMaps.put(a, itemStack);
-                                }
-                                ZodiacIntegrated.guildStorage.replaceAll((k, v) -> itemMaps);
-                                ItemStack itemStack2 = new ItemStack(Material.BARRIER, 1);
-                                player.getInventory().addItem(itemStack2);
+                    case "shop" -> {
+                        if (sender instanceof Player player) {
+                            if (!(shopUtil.isExistData(player))) {
+                                shopUtil.registerStorageData(player);
                             }
+                            ShopInv shopInv = new ShopInv(player);
+                            player.openInventory(shopInv.getInventory());
+                            shopInv.setMainInv(player);
+                        }
+                    }
+                    case "test" -> {
+                        if (sender instanceof Player player) {
+                            player.sendMessage("test: " + shopUtil.getShopDataItemStack().size());
+                            shopUtil.updateShopData();
                         }
                     }
                 }
@@ -99,16 +99,8 @@ public class MainCommand implements CommandExecutor {
                                 adminVar = args[1];
                                 switch (adminVar) {
                                     case "menu" -> {
-                                        player.closeInventory();
-                                    }
-                                    case "update-storage" -> {
-                                        if (args.length == 2) {
-                                            List<String> guildIdList = ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player");
-                                            for (String guildId: guildIdList) {
-                                                guildStorageUtil.storageFileDataCheck(guildId);
-                                            }
-                                            player.sendMessage(ChatColor.GREEN + "총 " + ChatColor.WHITE + guildIdList.size() + ChatColor.GREEN + "개의 길드 창고 데이터가 획인 완료 되었습니다");
-                                        }
+                                        AdminInv adminInv = new AdminInv(player);
+                                        player.openInventory(adminInv.getInventory());
                                     }
                                 }
                             }

@@ -46,7 +46,7 @@ public class GuildStorageInv implements InventoryHolder {
         itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicLoreList, "ZD-GuildStorage", "Back");
         addItemData(itemStack, "GuildStorage-FixItem", "FIX");
         guildStorageInv.setItem(45, itemStack);
-        itemStack = createNormalItem(Material.COMPASS, ChatColor.WHITE + "창고 업데이트", basicLoreList, "ZD-GuildStorage", "Update");
+        itemStack = createNormalItem(Material.COMPASS, ChatColor.WHITE + "창고 업데이트", basicLoreList, "ZD-GuildStorage", "Storage-Update");
         addItemData(itemStack, "GuildStorage-FixItem", "FIX");
         guildStorageInv.setItem(53, itemStack);
         ItemStack tempItem = createNormalItem(Material.BLACK_STAINED_GLASS_PANE, "", basicLoreList, "ZD-GuildStorage", "null");

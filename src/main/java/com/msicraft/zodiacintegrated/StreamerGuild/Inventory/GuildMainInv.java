@@ -77,7 +77,7 @@ public class GuildMainInv implements InventoryHolder {
         guildMainInv.setItem(45, itemStack);
         itemStack = createNormalItem(Material.NAME_TAG, ChatColor.WHITE + "길드 이름 변경", basicLoreList, "ZD-GuildManagement", "Change_Name");
         guildMainInv.setItem(19, itemStack);
-        itemStack = createNormalItem(Material.DIAMOND_SWORD, ChatColor.WHITE + "길드 직책 변경", basicLoreList, "ZD-GuildManagement", "Change_Rank");
+        itemStack = createNormalItem(Material.NETHERITE_SWORD, ChatColor.WHITE + "길드 직책 변경", basicLoreList, "ZD-GuildManagement", "Change_Rank");
         hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
         guildMainInv.setItem(20, itemStack);
     }

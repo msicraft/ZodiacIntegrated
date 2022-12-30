@@ -2,6 +2,7 @@ package com.msicraft.zodiacintegrated.StreamerGuild.Inventory.Event;
 
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildStorageUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
+import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildStorageInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import org.bukkit.ChatColor;
@@ -32,15 +33,31 @@ public class GuildStorageEvent implements Listener {
             ItemStack selectItem = e.getCurrentItem();
             ItemMeta selectItemMeta = selectItem.getItemMeta();
             PersistentDataContainer selectItemData = selectItemMeta.getPersistentDataContainer();
+            String guildId = guildUtil.getContainGuildID(player);
+            GuildMainInv guildMainInv = new GuildMainInv(player);
+            GuildStorageInv guildStorageInv = new GuildStorageInv(player, guildId);
             if (selectItemData.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "GuildStorage-FixItem"), PersistentDataType.STRING)) {
                 String data = selectItemData.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "GuildStorage-FixItem"), PersistentDataType.STRING);
                 if (data != null && data.equals("FIX")) {
                     e.setCancelled(true);
+                    if (selectItemData.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-GuildStorage"), PersistentDataType.STRING)) {
+                        String data2 = selectItemData.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-GuildStorage"), PersistentDataType.STRING);
+                        if (data2 != null) {
+                            switch (data2) {
+                                case "Back" -> {
+                                    player.openInventory(guildMainInv.getInventory());
+                                    guildMainInv.openMainMenu(player);
+                                }
+                                case "Storage-Update" -> {
+                                    player.openInventory(guildStorageInv.getInventory());
+                                    guildStorageInv.loadGuildStorage(guildId);
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
             }
-            String guildId = guildUtil.getContainGuildID(player);
-            GuildStorageInv guildStorageInv = new GuildStorageInv(player, guildId);
             InventoryType clickInventoryType = e.getClickedInventory().getType();
             e.setCancelled(true);
             switch (clickInventoryType) {
