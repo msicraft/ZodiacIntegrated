@@ -1,19 +1,19 @@
 package com.msicraft.zodiacintegrated.Shop;
 
+import com.msicraft.zodiacintegrated.Admin.AdminUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 public class ShopUtil {
 
     private final ItemStack airItemStack = new ItemStack(Material.AIR, 1);
+    private final AdminUtil adminUtil = new AdminUtil();
 
     public void registerStorageData(Player player) {
         if (!isExistData(player)) {
@@ -76,43 +76,47 @@ public class ShopUtil {
         }
     }
 
-    public ArrayList<ItemStack> getShopDataItemStack() {
-        ArrayList<ItemStack> list = new ArrayList<>();
-        ConfigurationSection section = ZodiacIntegrated.shopData.getConfig().getConfigurationSection("Item");
-        if (section != null) {
-            Set<String> list2 = section.getKeys(false);
-            for (String countS : list2) {
-                list.add(ZodiacIntegrated.shopData.getConfig().getItemStack("Item." + countS));
+    public int getItemValue(ItemStack itemStack, int amount) {
+        int itemValue = 0;
+        if (adminUtil.hasSameItemStack(itemStack)) {
+            int dataNum = adminUtil.getItemDataNumber(itemStack);
+            ItemStack getDataItem = ZodiacIntegrated.shopData.getConfig().getItemStack("Item." + dataNum + ".ItemStack");
+            if (getDataItem != null) {
+                double value = ZodiacIntegrated.shopData.getConfig().getDouble("Item." + dataNum + ".Value");
+                double perStackValue = value/(getDataItem.getAmount());
+                double resultValue = perStackValue * amount;
+                if (resultValue < 1) {
+                    itemValue = 0;
+                } else {
+                    itemValue = (int) Math.round(resultValue);
+                }
+            } else {
+                Bukkit.getConsoleSender().sendMessage("null" + " | " + dataNum);
             }
         }
-        return list;
+        return itemValue;
     }
 
-    public void updateShopData() {
-        ArrayList<ItemStack> itemStacks = getShopDataItemStack();
-        int size = itemStacks.size();
-        ZodiacIntegrated.shopData.getConfig().set("LastCount", size);
-        HashMap<Integer, ItemStack> itemMaps = new HashMap<>();
-        int count = 0;
-        for (ItemStack itemStack : itemStacks) {
-            itemMaps.put(count, itemStack);
-            count++;
+    public int getItemTotalValue(Player player) {
+        int total = 0;
+        if (isExistData(player)) {
+            HashMap<Integer, ItemStack> shopMap = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
+            for (Integer slot : shopMap.keySet()) {
+                ItemStack getMapItem = shopMap.get(slot);
+                if (getMapItem.getType() != Material.AIR) {
+                    int value = getItemValue(getMapItem, getMapItem.getAmount());
+                    total += value;
+                }
+            }
         }
-        ZodiacIntegrated.shopData.getConfig().set("Item", null);
-        ZodiacIntegrated.shopData.saveConfig();
-        for (Integer a : itemMaps.keySet()) {
-            ItemStack getItem = itemMaps.get(a);
-            ZodiacIntegrated.shopData.getConfig().set("Item." + a, getItem);
-        }
-        ZodiacIntegrated.shopData.saveConfig();
+        return total;
     }
 
-    public int getDataLastCount() {
-        int count = 0;
-        if (ZodiacIntegrated.shopData.getConfig().contains("LastCount")) {
-            count = ZodiacIntegrated.shopData.getConfig().getInt("LastCount");
+    public void replacePlayerShopData(Player player) {
+        if (isExistData(player)) {
+            HashMap<Integer, ItemStack> shopMap = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
+            shopMap.replaceAll((s, v) -> airItemStack);
         }
-        return count;
     }
 
 }

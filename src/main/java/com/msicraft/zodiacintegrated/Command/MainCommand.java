@@ -8,7 +8,9 @@ import com.msicraft.zodiacintegrated.StreamerGuild.GuildStorageUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -65,12 +67,6 @@ public class MainCommand implements CommandExecutor {
                             ShopInv shopInv = new ShopInv(player);
                             player.openInventory(shopInv.getInventory());
                             shopInv.setMainInv(player);
-                        }
-                    }
-                    case "test" -> {
-                        if (sender instanceof Player player) {
-                            player.sendMessage("test: " + shopUtil.getShopDataItemStack().size());
-                            shopUtil.updateShopData();
                         }
                     }
                 }

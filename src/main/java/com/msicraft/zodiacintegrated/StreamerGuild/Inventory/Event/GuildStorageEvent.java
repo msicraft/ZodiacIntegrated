@@ -51,6 +51,7 @@ public class GuildStorageEvent implements Listener {
                                 case "Storage-Update" -> {
                                     player.openInventory(guildStorageInv.getInventory());
                                     guildStorageInv.loadGuildStorage(guildId);
+                                    player.sendMessage(ChatColor.GREEN + "길드 창고가 업데이트 되었습니다.");
                                 }
                             }
                         }

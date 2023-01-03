@@ -3,6 +3,8 @@ package com.msicraft.zodiacintegrated.Shop.Event;
 import com.msicraft.zodiacintegrated.Shop.Inventory.ShopInv;
 import com.msicraft.zodiacintegrated.Shop.ShopUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +20,8 @@ public class ShopInvClickEvent implements Listener {
 
     private ShopUtil shopUtil = new ShopUtil();
 
-    private final int itemSlots[] = {9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44};
+    private final static int shopSellSlots[] = {9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44};
+    private final Economy economy = ZodiacIntegrated.getEconomy();
 
     @EventHandler
     public void onShopMainInvClick(InventoryClickEvent e) {
@@ -56,7 +59,18 @@ public class ShopInvClickEvent implements Listener {
                                     shopInv.setMainInv(player);
                                 }
                                 case "Sell" -> {
-                                    player.sendMessage("test: " + var);
+                                    if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Sell-Price"), PersistentDataType.STRING)) {
+                                        String valueS = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Sell-Price"), PersistentDataType.STRING);
+                                        if (valueS != null) {
+                                            int totalValue = Integer.parseInt(valueS);
+                                            shopUtil.replacePlayerShopData(player);
+                                            economy.depositPlayer(player, totalValue);
+                                            player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+ " + totalValue);
+                                            player.closeInventory();
+                                        }
+                                    } else {
+                                        player.closeInventory();
+                                    }
                                 }
                             }
                         }

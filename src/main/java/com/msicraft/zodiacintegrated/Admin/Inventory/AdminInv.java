@@ -1,5 +1,6 @@
 package com.msicraft.zodiacintegrated.Admin.Inventory;
 
+import com.msicraft.zodiacintegrated.Admin.AdminUtil;
 import com.msicraft.zodiacintegrated.Shop.ShopUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import net.kyori.adventure.text.Component;
@@ -27,6 +28,7 @@ public class AdminInv implements InventoryHolder {
     private ItemStack itemStack;
 
     private final ShopUtil shopUtil = new ShopUtil();
+    private final AdminUtil adminUtil = new AdminUtil();
     public HashMap<String, Integer> page = new HashMap<>();
 
     public HashMap<String, Integer> max_page = new HashMap<>();
@@ -36,12 +38,16 @@ public class AdminInv implements InventoryHolder {
         setMainInv();
     }
 
-    public void registerItemList() {
+    public void registeredItemList() {
+        //shopUtil.updateShopData();
         adminInv.clear();
+        itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicLoreList, "ZD-Admin-Shop-Item-DataNumber", "Back");
+        adminInv.setItem(45, itemStack);
         page_button_size();
         page_book();
         basic_button();
-        int max_size = shopUtil.getShopDataItemStack().size();
+        HashMap<ItemStack, Integer> itemMap = new HashMap<>(adminUtil.getShopDataHashMap());
+        int max_size = itemMap.size();
         int page_num = 0;
         if (page.containsKey("page")) {
             page_num = page.get("page");
@@ -49,20 +55,30 @@ public class AdminInv implements InventoryHolder {
         int gui_count = 0;
         int gui_max = 45;
         int lastCount = page_num*45;
-        ArrayList<ItemStack> itemStacks = shopUtil.getShopDataItemStack();
+        ArrayList<ItemStack> itemStacks = new ArrayList<>();
+        ArrayList<Integer> values = new ArrayList<>();
+        for (ItemStack itemStack : itemMap.keySet()) {
+            itemStacks.add(itemStack);
+            values.add(itemMap.get(itemStack));
+        }
         List<Component> tempLoreList = new ArrayList<>();
         for (int a = lastCount; a<max_size; a++) {
-            ItemStack itemStack = itemStacks.get(a);
             if (!tempLoreList.isEmpty()) {
                 tempLoreList.clear();
             }
+            ItemStack itemStack = new ItemStack(itemStacks.get(a));
+            int value = values.get(a);
+            if (!tempLoreList.isEmpty()) {
+                tempLoreList.clear();
+            }
+            int getDataNum = adminUtil.getItemDataNumber(itemStack);
             tempLoreList.add(Component.text(ChatColor.YELLOW + "Left Click: 가격 변경"));
             tempLoreList.add(Component.text(ChatColor.YELLOW + "Right Click: 아이템 제거"));
             ItemMeta itemMeta = itemStack.getItemMeta();
             PersistentDataContainer data = itemMeta.getPersistentDataContainer();
-            int getValue = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Item"), PersistentDataType.INTEGER);
+            data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Admin-Shop-Item-DataNumber"), PersistentDataType.STRING, String.valueOf(getDataNum));
             tempLoreList.add(Component.text(""));
-            tempLoreList.add(Component.text(ChatColor.GREEN + "현재 가격: " + ChatColor.WHITE + getValue));
+            tempLoreList.add(Component.text(ChatColor.GREEN + "현재 가격: " + ChatColor.WHITE + value));
             itemMeta.lore(tempLoreList);
             itemStack.setItemMeta(itemMeta);
             hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
@@ -108,8 +124,8 @@ public class AdminInv implements InventoryHolder {
         adminInv.setItem(48, itemStack);
     }
 
-    private void page_button_size() {
-        int max_size = shopUtil.getShopDataItemStack().size();
+    public void page_button_size() {
+        int max_size = adminUtil.getShopDataHashMap().size();
         int page_count = max_size/45;
         max_page.put("max-page", page_count);
     }
@@ -119,6 +135,8 @@ public class AdminInv implements InventoryHolder {
         adminInv.setItem(10, itemStack);
         itemStack = createNormalItem(Material.CHEST, ChatColor.WHITE + "아이템 등록", basicLoreList, "ZD-Admin-Shop", "Shop-Register-Item");
         adminInv.setItem(11, itemStack);
+        itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicLoreList, "ZD-Admin-Shop", "Back");
+        adminInv.setItem(45, itemStack);
     }
 
     private void setMainInv() {

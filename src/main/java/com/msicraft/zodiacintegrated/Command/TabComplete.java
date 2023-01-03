@@ -22,6 +22,7 @@ public class TabComplete implements TabCompleter {
                 arguments.add("reload");
                 arguments.add("guild");
                 arguments.add("admin");
+                arguments.add("shop");
                 return arguments;
             }
             if (args.length == 2 && args[0].equals("admin") && sender.isOp()) {

@@ -35,8 +35,21 @@ public class ShopInv implements InventoryHolder {
         setMainIcon(player);
         sellInv(player);
         HashMap<Integer, ItemStack> itemMaps = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
+        List<Component> tempLoreList = new ArrayList<>();
         for (int a = 9; a<45; a++) {
-            ItemStack itemStack = itemMaps.get(a);
+            if (!tempLoreList.isEmpty()) {
+                tempLoreList.clear();
+            }
+            ItemStack itemStack = new ItemStack(itemMaps.get(a));
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemStack.getType() != Material.AIR) {
+                int getValue = shopUtil.getItemValue(itemStack, itemStack.getAmount());
+                tempLoreList.add(Component.text(ChatColor.GREEN + "가격: " + ChatColor.WHITE + getValue));
+                PersistentDataContainer data = itemMeta.getPersistentDataContainer();
+                data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-PlayerSellShop"), PersistentDataType.STRING, String.valueOf(getValue));
+                itemMeta.lore(tempLoreList);
+                itemStack.setItemMeta(itemMeta);
+            }
             shopInv.setItem(a, itemStack);
         }
     }
@@ -49,9 +62,6 @@ public class ShopInv implements InventoryHolder {
         itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicList, "ZD-Shop-Sell", "Back");
         addItemData(itemStack, "Shop-FixItem", "FIX");
         shopInv.setItem(45, itemStack);
-        itemStack = createNormalItem(Material.STONE_BUTTON, "판매 확인", basicList, "ZD-Shop-Sell", "Sell");
-        addItemData(itemStack, "Shop-FixItem", "FIX");
-        shopInv.setItem(53, itemStack);
         ItemStack tempItem = createNormalItem(Material.BLACK_STAINED_GLASS_PANE, "", basicList, "ZD-Shop-Sell", "null");
         addItemData(tempItem, "Shop-FixItem", "FIX");
         for (int a = 46; a<54; a++) {
@@ -60,11 +70,30 @@ public class ShopInv implements InventoryHolder {
                 shopInv.setItem(a, tempItem);
             }
         }
+        List<Component> tempLoreList = new ArrayList<>();
         HashMap<Integer, ItemStack> itemMaps = ZodiacIntegrated.shopStorageData.get(player.getUniqueId());
         for (int a = 9; a<45; a++) {
-            ItemStack itemStack = itemMaps.get(a);
+            if (!tempLoreList.isEmpty()) {
+                tempLoreList.clear();
+            }
+            ItemStack itemStack = new ItemStack(itemMaps.get(a));
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemStack.getType() != Material.AIR) {
+                int getValue = shopUtil.getItemValue(itemStack, itemStack.getAmount());
+                tempLoreList.add(Component.text(ChatColor.GREEN + "가격: " + ChatColor.WHITE + getValue));
+                PersistentDataContainer data = itemMeta.getPersistentDataContainer();
+                data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Sell"), PersistentDataType.STRING, String.valueOf(getValue));
+                itemMeta.lore(tempLoreList);
+                itemStack.setItemMeta(itemMeta);
+            }
             shopInv.setItem(a, itemStack);
         }
+        int totalValue = shopUtil.getItemTotalValue(player);
+        basicList.add(Component.text(ChatColor.GREEN + "총 가격: " + ChatColor.WHITE + totalValue));
+        itemStack = createNormalItem(Material.STONE_BUTTON, "판매 확인", basicList, "ZD-Shop-Sell", "Sell");
+        addItemData(itemStack, "ZD-Shop-Sell-Price", String.valueOf(totalValue));
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(53, itemStack);
     }
 
     public void setMainInv(Player player) {
