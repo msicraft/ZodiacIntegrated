@@ -206,10 +206,12 @@ public class GuildMainInv implements InventoryHolder {
             itemStack = getMemberPlayerHead(offlinePlayer);
             ItemMeta itemMeta = itemStack.getItemMeta();
             PersistentDataContainer data = itemMeta.getPersistentDataContainer();
-            data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING, offlinePlayer.getName());
-            itemStack.setItemMeta(itemMeta);
-            guildMainInv.setItem(slot, itemStack);
-            count++;
+            if (offlinePlayer.getName() != null) {
+                data.set(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING, offlinePlayer.getName());
+                itemStack.setItemMeta(itemMeta);
+                guildMainInv.setItem(slot, itemStack);
+                count++;
+            }
             if (count >= max) {
                 break;
             }

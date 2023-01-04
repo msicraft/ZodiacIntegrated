@@ -7,6 +7,8 @@ import com.msicraft.zodiacintegrated.StreamerGuild.GuildUtil;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildMainInv;
 import com.msicraft.zodiacintegrated.StreamerGuild.Inventory.GuildStorageInv;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -19,8 +21,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -298,11 +298,10 @@ public class GuildMainInvEvent implements Listener {
                         } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING)) {
                             String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING);
                             if (var != null && e.isLeftClick()) {
-                                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                                Clipboard clipboard = toolkit.getSystemClipboard();
-                                StringSelection strSel = new StringSelection(var);
-                                clipboard.setContents(strSel, null);
-                                player.sendMessage(ChatColor.GREEN + "플레이어의 이름이 복사되었습니다.");
+                                //player.sendMessage(ChatColor.GREEN + "플레이어의 이름이 복사되었습니다.");
+                                TextComponent component = new TextComponent(ChatColor.GREEN + "" +ChatColor.BOLD +"[클릭시 이름이 자동으로 채팅에 입력됩니다]");
+                                component.setClickEvent( new ClickEvent( ClickEvent.Action.SUGGEST_COMMAND, var));
+                                player.sendMessage(component);
                             }
                         }
                     }
