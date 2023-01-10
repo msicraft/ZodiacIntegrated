@@ -1,5 +1,6 @@
 package com.msicraft.zodiacintegrated.Shop.Inventory;
 
+import com.msicraft.zodiacintegrated.Admin.AdminUtil;
 import com.msicraft.zodiacintegrated.Shop.ShopUtil;
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
 import net.kyori.adventure.text.Component;
@@ -19,11 +20,13 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class ShopInv implements InventoryHolder {
 
     private Inventory shopInv;
     private ShopUtil shopUtil = new ShopUtil();
+    private AdminUtil adminUtil = new AdminUtil();
     private List<Component> basicList = new ArrayList<>();
     private ItemStack itemStack;
 
@@ -52,6 +55,84 @@ public class ShopInv implements InventoryHolder {
             }
             shopInv.setItem(a, itemStack);
         }
+    }
+
+    public void checkItemPrice(Player player) {
+        shopInv.clear();
+        itemListMaxPage(player);
+        itemStack = createNormalItem(Material.BARRIER, ChatColor.RED + "Back", basicList, "ZD-Shop-ItemList", "Back");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(45, itemStack);
+        itemStack = createNormalItem(Material.ARROW, "다음", basicList, "ZD-Shop-ItemList", "Next");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(50, itemStack);
+        itemStack = createNormalItem(Material.ARROW, "이전", basicList, "ZD-Shop-ItemList", "Previous");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(48, itemStack);
+        if (!basicList.isEmpty()) {
+            basicList.clear();
+        }
+        ItemStack tempItem = createNormalItem(Material.BLACK_STAINED_GLASS_PANE, "", basicList, "ZD-Shop-ItemList", "null");
+        addItemData(tempItem, "Shop-FixItem", "FIX");
+        for (int a = 46; a<54; a++) {
+            ItemStack stack = shopInv.getItem(a);
+            if (stack == null) {
+                shopInv.setItem(a, tempItem);
+            }
+        }
+        HashMap<ItemStack, Integer> getShopItemMap = new HashMap<>(adminUtil.getShopDataHashMap());
+        ArrayList<ItemStack> getItemStackList = new ArrayList<>(getShopItemMap.keySet());
+        int maxSize = getItemStackList.size();
+        int page_num = 0;
+        String pageNumObject = shopItemPrice_page.get(player.getUniqueId());
+        if (pageNumObject != null) {
+            String[] a = pageNumObject.split(":");
+            page_num = Integer.parseInt(a[1]);
+        }
+        int lastCount = page_num*45;
+        int count = 0;
+        List<Component> loreList = new ArrayList<>();
+        for (int a = lastCount; a<maxSize; a++) {
+            if (!loreList.isEmpty()) {
+                loreList.clear();
+            }
+            ItemStack tempItemStack = new ItemStack(getItemStackList.get(a));
+            int getValue = getShopItemMap.get(tempItemStack);
+            ItemMeta tempMeta = tempItemStack.getItemMeta();
+            loreList.add(Component.text(ChatColor.GREEN + "가격: " + ChatColor.WHITE + getValue));
+            tempMeta.lore(loreList);
+            tempItemStack.setItemMeta(tempMeta);
+            addItemData(tempItemStack, "Shop-FixItem", "FIX");
+            shopInv.setItem(count, tempItemStack);
+            count++;
+            if (count >= 45) {
+                break;
+            }
+        }
+    }
+
+    public static HashMap<UUID, String> shopItemPrice_page = new HashMap<>(); //"page:<count>"
+    public static HashMap<UUID, String> shopItemPrice_maxPage = new HashMap<>(); //"max-page:<count>"
+
+    private void itemListMaxPage(Player player) {
+        int max = adminUtil.getDataLastCount();
+        int maxCount = max/45;
+        String var = "max-page:" + maxCount;
+        shopItemPrice_maxPage.put(player.getUniqueId(), var);
+        //
+        String getPage = shopItemPrice_page.get(player.getUniqueId());
+        String pageCount = "0";
+        if (getPage != null) {
+            String[] a = getPage.split(":");
+            pageCount = a[1];
+        }
+        int count = Integer.parseInt(pageCount) + 1;
+        ItemStack itemStack = new ItemStack(Material.BOOK, 1);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(Component.text(ChatColor.WHITE + "Page: " + count));
+        itemStack.setItemMeta(itemMeta);
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(49, itemStack);
     }
 
     public void sellInv(Player player) {
@@ -102,6 +183,9 @@ public class ShopInv implements InventoryHolder {
             basicList.clear();
         }
         itemStack = createNormalItem(Material.HOPPER, "아이템 판매", basicList, "ShopMain", "SELL");
+        addItemData(itemStack, "Shop-FixItem", "FIX");
+        shopInv.setItem(20, itemStack);
+        itemStack = createNormalItem(Material.CHEST, "아이템 가격 확인", basicList, "ShopMain", "ITEM-PRICE");
         addItemData(itemStack, "Shop-FixItem", "FIX");
         shopInv.setItem(19, itemStack);
     }

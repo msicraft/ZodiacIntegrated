@@ -91,7 +91,7 @@ public class GuildMainInv implements InventoryHolder {
     public static HashMap<UUID, String> otherGuild_page = new HashMap<>(); //"page:<count>"
     public static HashMap<UUID, String> otherGuild_maxPage = new HashMap<>(); //"max-page:<count>"
     private static final int[] guildSlots = {9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44};
-    private ArrayList<String> guildIdList = new ArrayList<>(ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player"));
+    private final ArrayList<String> guildIdList = new ArrayList<>(ZodiacIntegrated.getPlugin().getConfig().getStringList("Identified-Player"));
 
 
     public void setOtherGuildList(Player player) {
@@ -246,7 +246,7 @@ public class GuildMainInv implements InventoryHolder {
         basicLoreList.add(Component.text(""));
         basicLoreList.add(Component.text(ChatColor.WHITE + "직책: " + ChatColor.GREEN + getRank));
         basicLoreList.add(Component.text(""));
-        basicLoreList.add(Component.text(ChatColor.YELLOW + "클릭시 이름 복사"));
+        basicLoreList.add(Component.text(ChatColor.YELLOW + "클릭시 이름복사를 가능하게 해주는 텍스트가 채팅에 나옵니다"));
         skullMeta.lore(basicLoreList);
         itemStack.setItemMeta(skullMeta);
         return itemStack;

@@ -1,6 +1,7 @@
 package com.msicraft.zodiacintegrated.Command;
 
 import com.msicraft.zodiacintegrated.Admin.Inventory.AdminInv;
+import com.msicraft.zodiacintegrated.EvolutionEntity.EvolutionEntityUtil;
 import com.msicraft.zodiacintegrated.PlayerUtils.PlayerUtil;
 import com.msicraft.zodiacintegrated.Shop.Inventory.ShopInv;
 import com.msicraft.zodiacintegrated.Shop.ShopUtil;
@@ -67,6 +68,13 @@ public class MainCommand implements CommandExecutor {
                             ShopInv shopInv = new ShopInv(player);
                             player.openInventory(shopInv.getInventory());
                             shopInv.setMainInv(player);
+                        }
+                    }
+                    case "test" -> {
+                        if (sender instanceof Player player) {
+                            EvolutionEntityUtil evolutionMonsterUtil = new EvolutionEntityUtil();
+                            player.sendMessage("test: " + evolutionMonsterUtil.getRegisteredEntities().toString());
+                            player.sendMessage("test2: " + evolutionMonsterUtil.hasNearbyPlayer(player));
                         }
                     }
                 }

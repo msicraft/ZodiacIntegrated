@@ -1,0 +1,11 @@
+config-version: 1  #don't touch this
+
+Setting:
+  Enabled: false
+  Check-Nearby-Player:
+    Enabled: false
+    Radius: 10
+  BlackList:
+    #- <vanilla_mobType>
+
+Evolution:

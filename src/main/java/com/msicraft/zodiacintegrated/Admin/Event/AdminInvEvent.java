@@ -108,6 +108,7 @@ public class AdminInvEvent implements Listener {
                             adminInv.page.put("page", next_page);
                         }
                     }
+                    player.openInventory(adminInv.getInventory());
                     adminInv.registeredItemList();
                 }
             } else if (selectItemData.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Admin-Shop-Item-DataNumber"), PersistentDataType.STRING)) {

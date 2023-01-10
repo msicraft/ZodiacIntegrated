@@ -82,13 +82,14 @@ public class ShopUtil {
             int dataNum = adminUtil.getItemDataNumber(itemStack);
             ItemStack getDataItem = ZodiacIntegrated.shopData.getConfig().getItemStack("Item." + dataNum + ".ItemStack");
             if (getDataItem != null) {
+                int getStackAmount = getDataItem.getAmount();
                 double value = ZodiacIntegrated.shopData.getConfig().getDouble("Item." + dataNum + ".Value");
-                double perStackValue = value/(getDataItem.getAmount());
+                double perStackValue = value/getStackAmount;
                 double resultValue = perStackValue * amount;
                 if (resultValue < 1) {
                     itemValue = 0;
                 } else {
-                    itemValue = (int) Math.round(resultValue);
+                    itemValue = (int) Math.floor(resultValue);
                 }
             } else {
                 Bukkit.getConsoleSender().sendMessage("null" + " | " + dataNum);

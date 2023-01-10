@@ -82,7 +82,7 @@ public class AdminInv implements InventoryHolder {
             itemMeta.lore(tempLoreList);
             itemStack.setItemMeta(itemMeta);
             hideItemFlag(itemStack, ItemFlag.HIDE_ATTRIBUTES);
-            adminInv.setItem(a, itemStack);
+            adminInv.setItem(gui_count, itemStack);
             gui_count++;
             if (gui_count >= gui_max) {
                 break;

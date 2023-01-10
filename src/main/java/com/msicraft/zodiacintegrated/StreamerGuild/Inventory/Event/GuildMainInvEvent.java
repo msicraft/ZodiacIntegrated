@@ -20,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -298,10 +297,11 @@ public class GuildMainInvEvent implements Listener {
                         } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING)) {
                             String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Guild-MemberList"), PersistentDataType.STRING);
                             if (var != null && e.isLeftClick()) {
-                                //player.sendMessage(ChatColor.GREEN + "플레이어의 이름이 복사되었습니다.");
-                                TextComponent component = new TextComponent(ChatColor.GREEN + "" +ChatColor.BOLD +"[클릭시 이름이 자동으로 채팅에 입력됩니다]");
-                                component.setClickEvent( new ClickEvent( ClickEvent.Action.SUGGEST_COMMAND, var));
+                                //TextComponent component = new TextComponent(ChatColor.GREEN + "" +ChatColor.BOLD +"[클릭시 이름이 자동으로 채팅에 입력됩니다]");
+                                TextComponent component = new TextComponent(ChatColor.GREEN + "" +ChatColor.BOLD +"[클릭시 플레이어의 이름이 복사됩니다]");
+                                component.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, var));
                                 player.sendMessage(component);
+                                player.closeInventory();
                             }
                         }
                     }

@@ -6,8 +6,9 @@ import com.msicraft.zodiacintegrated.Admin.Event.AdminInvEvent;
 import com.msicraft.zodiacintegrated.Command.MainCommand;
 import com.msicraft.zodiacintegrated.Command.TabComplete;
 import com.msicraft.zodiacintegrated.Event.DeathPenalty;
-import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionConfig;
-import com.msicraft.zodiacintegrated.EvolutionMonster.Data.EvolutionDataConfig;
+import com.msicraft.zodiacintegrated.EvolutionEntity.Data.EvolutionConfig;
+import com.msicraft.zodiacintegrated.EvolutionEntity.Data.EvolutionDataConfig;
+import com.msicraft.zodiacintegrated.EvolutionEntity.Event.EvolutionEntityDeath;
 import com.msicraft.zodiacintegrated.Shop.Data.ShopData;
 import com.msicraft.zodiacintegrated.Shop.Event.ShopInvClickEvent;
 import com.msicraft.zodiacintegrated.StreamerGuild.Data.GuildStorageData;
@@ -152,6 +153,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
         pluginManager.registerEvents(new GuildStorageEvent(), this);
         pluginManager.registerEvents(new AdminInvEvent(), this);
         pluginManager.registerEvents(new AdminInvChatEvent(), this);
+        pluginManager.registerEvents(new EvolutionEntityDeath(), this);
     }
 
     private void commandsRegister() {
@@ -166,6 +168,7 @@ public final class ZodiacIntegrated extends JavaPlugin {
         getPlugin().reloadConfig();
         streamerGuildData.reloadConfig();
         whiteListPlayerData.reloadConfig();
+        evolutionConfig.reloadConfig();
     }
 
     protected FileConfiguration config;

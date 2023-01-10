@@ -16,9 +16,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 public class ShopInvClickEvent implements Listener {
 
     private ShopUtil shopUtil = new ShopUtil();
+
+    public static HashMap<UUID, String> itemPricePageCount = new HashMap<>(); //"page:<count>"
 
     private final static int shopSellSlots[] = {9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44};
     private final Economy economy = ZodiacIntegrated.getEconomy();
@@ -48,6 +53,10 @@ public class ShopInvClickEvent implements Listener {
                                     player.openInventory(shopInv.getInventory());
                                     shopInv.sellInv(player);
                                 }
+                                case "ITEM-PRICE" -> {
+                                    player.openInventory(shopInv.getInventory());
+                                    shopInv.checkItemPrice(player);
+                                }
                             }
                         }
                     } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Sell"), PersistentDataType.STRING)) {
@@ -74,24 +83,83 @@ public class ShopInvClickEvent implements Listener {
                                 }
                             }
                         }
+                    } else if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-ItemList"), PersistentDataType.STRING)) {
+                        String var = data.get(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-ItemList"), PersistentDataType.STRING);
+                        if (var != null) {
+                            String maxPageObject = ShopInv.shopItemPrice_maxPage.get(player.getUniqueId());
+                            int maxPageCount = 0;
+                            if (maxPageObject != null) {
+                                String[] a = maxPageObject.split(":");
+                                maxPageCount = Integer.parseInt(a[1]);
+                            }
+                            itemPricePageCount.putIfAbsent(player.getUniqueId(), "page:0");
+                            switch (var) {
+                                case "Back" -> {
+                                    player.openInventory(shopInv.getInventory());
+                                    shopInv.setMainInv(player);
+                                }
+                                case "Next" -> {
+                                    String currentPageObject = itemPricePageCount.get(player.getUniqueId());
+                                    int currentPage = 0;
+                                    if (currentPageObject != null) {
+                                        String[] a = currentPageObject.split(":");
+                                        currentPage = Integer.parseInt(a[1]);
+                                    }
+                                    int nextPage = currentPage + 1;
+                                    if (nextPage > maxPageCount) {
+                                        nextPage = 0;
+                                    }
+                                    String value = "page:" + nextPage;
+                                    itemPricePageCount.put(player.getUniqueId(), value);
+                                    ShopInv.shopItemPrice_page.put(player.getUniqueId(), value);
+                                    player.openInventory(shopInv.getInventory());
+                                    shopInv.checkItemPrice(player);
+                                }
+                                case "Previous" -> {
+                                    String currentPageObject = itemPricePageCount.get(player.getUniqueId());
+                                    int currentPage = 0;
+                                    if (currentPageObject != null) {
+                                        String[] a = currentPageObject.split(":");
+                                        currentPage = Integer.parseInt(a[1]);
+                                    }
+                                    int nextPage = currentPage - 1;
+                                    if (nextPage < 0) {
+                                        nextPage = maxPageCount;
+                                    }
+                                    String value = "page:" + nextPage;
+                                    itemPricePageCount.put(player.getUniqueId(), value);
+                                    ShopInv.shopItemPrice_page.put(player.getUniqueId(), value);
+                                    player.openInventory(shopInv.getInventory());
+                                    shopInv.checkItemPrice(player);
+                                }
+                            }
+                        }
                     }
                     return;
                 }
             }
-            InventoryType clickInventoryType = e.getClickedInventory().getType();
             e.setCancelled(true);
-            switch (clickInventoryType) {
-                case PLAYER -> {
-                    int slot = e.getSlot();
-                    shopUtil.sendPlayerToStorage(player, selectItem, slot);
-                    player.openInventory(shopInv.getInventory());
-                    shopInv.loadShopStorage(player);
-                }
-                case CHEST -> {
-                    int slot = e.getSlot();
-                    shopUtil.sendStorageToPlayer(player, slot);
-                    player.openInventory(shopInv.getInventory());
-                    shopInv.loadShopStorage(player);
+            ItemStack backItem = e.getInventory().getItem(45);
+            if (backItem != null) {
+                ItemMeta itemMeta = backItem.getItemMeta();
+                PersistentDataContainer data = itemMeta.getPersistentDataContainer();
+                if (data.has(new NamespacedKey(ZodiacIntegrated.getPlugin(), "ZD-Shop-Sell"), PersistentDataType.STRING)) {
+                    InventoryType clickInventoryType = e.getClickedInventory().getType();
+                    e.setCancelled(true);
+                    switch (clickInventoryType) {
+                        case PLAYER -> {
+                            int slot = e.getSlot();
+                            shopUtil.sendPlayerToStorage(player, selectItem, slot);
+                            player.openInventory(shopInv.getInventory());
+                            shopInv.loadShopStorage(player);
+                        }
+                        case CHEST -> {
+                            int slot = e.getSlot();
+                            shopUtil.sendStorageToPlayer(player, slot);
+                            player.openInventory(shopInv.getInventory());
+                            shopInv.loadShopStorage(player);
+                        }
+                    }
                 }
             }
         }

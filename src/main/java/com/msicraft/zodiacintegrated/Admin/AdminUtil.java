@@ -1,10 +1,8 @@
 package com.msicraft.zodiacintegrated.Admin;
 
 import com.msicraft.zodiacintegrated.ZodiacIntegrated;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -52,9 +50,13 @@ public class AdminUtil {
     public int getItemDataNumber(ItemStack itemStack) {
         int number = 0;
         HashMap<ItemStack, Integer> map = getShopDataHashMap();
+        ItemStack tempStack = new ItemStack(itemStack);
+        tempStack.setAmount(1);
         int count = 0;
         for (ItemStack mapItemStack : map.keySet()) {
-            if (mapItemStack.equals(itemStack)) {
+            ItemStack tempMapStack = new ItemStack(mapItemStack);
+            tempMapStack.setAmount(1);
+            if (tempMapStack.equals(tempStack)) {
                 number = count;
                 break;
             } else {
